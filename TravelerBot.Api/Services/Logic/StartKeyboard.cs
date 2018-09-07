@@ -5,7 +5,7 @@ using TravelerBot.Api.Services.Interfaces;
 
 namespace TravelerBot.Api.Services.Logic
 {
-    public class MainKeyboard : IKeyboard
+    public class StartKeyboard : IKeyboard
     {
         public ResponseModel Get()
         {
@@ -69,6 +69,16 @@ namespace TravelerBot.Api.Services.Logic
                 Message = message,
                 Keyboard = keyboard
             };
+        }
+
+        public ResponseModel Get(string buttonName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ResponseModel Get(InboundButton[] inboundButtons)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TravelerBot.Api.ResourceModels;
 using TravelerBot.Api.Services.Interfaces;
+using System.Linq;
 
 namespace TravelerBot.Api.Services.Logic
 {
@@ -11,13 +10,23 @@ namespace TravelerBot.Api.Services.Logic
     {
         public ResponseModel Get(string buttonName)
         {
+            throw new System.NotImplementedException();
+        }
+
+        public ResponseModel Get()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ResponseModel Get(InboundButton[] inboundButtons)
+        {
             var message = "Укажите все необходимые пункты";
 
             var buttons = new List<Button>
                 {
                     new Button
                     {
-                        Color = (buttonName == "Водитель") ? "positive" : "default",
+                        Color = (inboundButtons.First(t => t.Index == 1) != null) ? "positive" : "default",
                         Action = new Action
                         {
                             Label = "Водитель",
@@ -30,7 +39,7 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new Button
                     {
-                        Color = (buttonName == "Пассажир") ? "positive" : "default",
+                        Color = (inboundButtons.First(t => t.Index == 2) != null) ? "positive" : "default",
                         Action = new Action
                         {
                             Label = "Пассажир",
@@ -47,10 +56,10 @@ namespace TravelerBot.Api.Services.Logic
                 {
                     new Button
                     {
-                        Color = "default",
+                        Color = (inboundButtons.First(t => t.Index == 3) != null) ? "positive" : "default",
                         Action = new Action
                         {
-                            Label = "Откуда",
+                            Label = (inboundButtons.First(t => t.Index == 3) != null) ? $"Откуда - {inboundButtons.First(t => t.Index == 3).Value}" : "Откуда",
                             Type = "text",
                             Payload = JsonConvert.SerializeObject(new
                             {
@@ -60,10 +69,10 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new Button
                     {
-                        Color = "default",
+                        Color = (inboundButtons.First(t => t.Index == 4) != null) ? "positive" : "default",
                         Action = new Action
                         {
-                            Label = "Куда",
+                            Label = (inboundButtons.First(t => t.Index == 4) != null) ? $"Куда - {inboundButtons.First(t => t.Index == 4)}" : "Куда",
                             Type = "text",
                             Payload = JsonConvert.SerializeObject(new
                             {
@@ -127,11 +136,24 @@ namespace TravelerBot.Api.Services.Logic
                             Color = "default",
                             Action = new Action
                             {
-                                Label = "Перейти на начало",
+                                Label = "Готово",
                                 Type = "text",
                                 Payload = JsonConvert.SerializeObject(new
                                 {
                                     button = "8"
+                                })
+                            }
+                        },
+                        new Button
+                        {
+                            Color = "default",
+                            Action = new Action
+                            {
+                                Label = "Перейти на начало",
+                                Type = "text",
+                                Payload = JsonConvert.SerializeObject(new
+                                {
+                                    button = "9"
                                 })
                             }
                         }
@@ -154,11 +176,6 @@ namespace TravelerBot.Api.Services.Logic
                 Message = message,
                 Keyboard = keyboard
             };
-        }
-
-        public ResponseModel Get()
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
