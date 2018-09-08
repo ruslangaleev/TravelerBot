@@ -1,24 +1,27 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TravelerBot.Api.ResourceModels;
 using TravelerBot.Api.Services.Interfaces;
 
 namespace TravelerBot.Api.Services.Logic
 {
-    public class StartKeyboard : IKeyboard
+    public class DateKeyboard : IKeyboard
     {
         public ResponseModel Get()
         {
-            var message = "Найти поездку или добавить новую поездку?";
+            var message = "Выберите дату";
 
             var buttons = new List<Button>
                 {
                     new Button
                     {
                         Color = "default",
-                        Action = new Action
+                        Action = new ResourceModels.Action
                         {
-                            Label = "Найти поездку",
+                            Label = "Сегодня",
                             Type = "text",
                             Payload = JsonConvert.SerializeObject(new
                             {
@@ -29,9 +32,9 @@ namespace TravelerBot.Api.Services.Logic
                     new Button
                     {
                         Color = "default",
-                        Action = new Action
+                        Action = new ResourceModels.Action
                         {
-                            Label = "Добавить поездку",
+                            Label = "Завтра",
                             Type = "text",
                             Payload = JsonConvert.SerializeObject(new
                             {
@@ -46,7 +49,7 @@ namespace TravelerBot.Api.Services.Logic
                         new Button
                         {
                             Color = "default",
-                            Action = new Action
+                            Action = new ResourceModels.Action
                             {
                                 Label = "Перейти на начало",
                                 Type = "text",
@@ -73,12 +76,12 @@ namespace TravelerBot.Api.Services.Logic
 
         public ResponseModel Get(string buttonName)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public ResponseModel Get(InboundButton[] inboundButtons)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
