@@ -9,7 +9,7 @@ namespace TravelerBot.Api.Services.Logic
     {
         public ResponseModel Get()
         {
-            var message = "Вы пассажир или водитель?";
+            var message = "Добавить или найти поездку?";
 
             var buttons = new List<Button>
                 {

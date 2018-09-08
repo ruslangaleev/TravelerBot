@@ -112,22 +112,22 @@ namespace TravelerBot.Api.Services.Logic
                     }
                 }.ToArray();
 
-            var buttonsDescription = new List<Button>
-                {
-                    new Button
-                    {
-                        Color = "default",
-                        Action = new Action
-                        {
-                            Label = "Комментарии",
-                            Type = "text",
-                            Payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "7"
-                            })
-                        }
-                    }
-                }.ToArray();
+            //var buttonsDescription = new List<Button>
+            //    {
+            //        new Button
+            //        {
+            //            Color = "default",
+            //            Action = new Action
+            //            {
+            //                Label = "Комментарии",
+            //                Type = "text",
+            //                Payload = JsonConvert.SerializeObject(new
+            //                {
+            //                    button = "7"
+            //                })
+            //            }
+            //        }
+            //    }.ToArray();
 
             var startKeyboard = new List<Button>
                     {
