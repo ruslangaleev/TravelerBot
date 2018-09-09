@@ -8,6 +8,6 @@ namespace TravelerBot.Api.Services.Interfaces
 
         ResponseModel Get(string buttonName);
 
-        ResponseModel Get(InboundButton[] inboundButtons)
+        ResponseModel Get(InboundButton[] inboundButtons);
     }
 }

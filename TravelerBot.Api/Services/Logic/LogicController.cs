@@ -4,12 +4,20 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using TravelerBot.Api.Data.Models;
+using TravelerBot.Api.Data.Repositories;
 using TravelerBot.Api.ResourceModels;
 
 namespace TravelerBot.Api.Services.Logic
 {
     public class LogicController
     {
+        private readonly ITripRepository _tripRepository;
+
+        public LogicController(ITripRepository tripRepository)
+        {
+            _tripRepository = tripRepository;
+        }
+
         // Временный словарь
         private readonly Dictionary<int, Trip> trips = new Dictionary<int, Trip>();
 
@@ -191,6 +199,8 @@ namespace TravelerBot.Api.Services.Logic
                     }
                 });
             }
+
+            return null;
         }
     }
 }
