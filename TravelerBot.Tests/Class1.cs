@@ -55,5 +55,46 @@ namespace TravelerBot.Tests
 
             Assert.IsNotNull(trip);
         }
+
+        [Test]
+        public void ReturnsDate()
+        {
+            Trip trip = new Trip
+            {
+                Date = true,
+                TypeParticipant = TypeParticipant.Driver,
+                AccountId = 123456
+            };
+
+            var tripRepository = new Mock<ITripRepository>();
+            tripRepository.Setup(t => t.Get(It.IsAny<int>())).ReturnsAsync(trip);
+            tripRepository.Setup(t => t.Update(It.IsAny<Trip>())).Callback((Trip param) =>
+            {
+                trip = param;
+            });
+
+            var logicController = new LogicController(tripRepository.Object);
+
+            var result = logicController.Get("Сегодня", 123456);
+
+            // Воидтель
+            Assert.AreEqual(2, result.Keyboard.Buttons[0].Length);
+            // Откуда или куда
+            Assert.AreEqual(2, result.Keyboard.Buttons[1].Length);
+            //Когда и во сколько
+            Assert.AreEqual(2, result.Keyboard.Buttons[2].Length);
+            // На начало
+            Assert.AreEqual(2, result.Keyboard.Buttons[3].Length);
+
+            // Водитель
+            Assert.AreEqual("positive", result.Keyboard.Buttons[0][0].Color);
+
+            // Когда
+            Assert.AreEqual("positive", result.Keyboard.Buttons[2][0].Color);
+
+            var date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            Assert.AreEqual(date, trip.DateTime);
+        }
     }
 }

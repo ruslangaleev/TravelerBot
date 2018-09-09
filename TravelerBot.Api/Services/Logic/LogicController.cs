@@ -103,7 +103,7 @@ namespace TravelerBot.Api.Services.Logic
                 }
             }
 
-            var tripp = trips[accountVkontakteId];
+            var tripp = _tripRepository.Get(accountVkontakteId).GetAwaiter().GetResult(); //trips[accountVkontakteId];
             if (tripp.From)
             {
                 tripp.From = false;
@@ -149,11 +149,24 @@ namespace TravelerBot.Api.Services.Logic
             if (tripp.Date)
             {
                 tripp.Date = false;
-                var now = (buttonName == "Сегодня") ? DateTime.Now : DateTime.Now.AddDays(1);
-                tripp.DateTime = now;
+                switch(buttonName)
+                {
+                    case "Сегодня":
+                        tripp.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                        break;
+                    case "Завтра":
+                        tripp.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1);
+                        break;
+                    default:
+                        throw new ArgumentException("Необходимо указать дату");
+                }
+
+                _tripRepository.Update(tripp);
+                //var now = (buttonName == "Сегодня") ? DateTime.Now : DateTime.Now.AddDays(1);
+                //tripp.DateTime = now;
 
                 var s = new MenuKeyboard();
-                s.Get(new InboundButton[]
+                return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {

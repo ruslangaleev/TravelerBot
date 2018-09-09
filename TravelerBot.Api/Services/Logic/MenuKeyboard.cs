@@ -86,7 +86,7 @@ namespace TravelerBot.Api.Services.Logic
                 {
                     new Button
                     {
-                        Color = "default",
+                        Color = (inboundButtons.FirstOrDefault(t => t.Index == 5) != null) ? "positive" : "default",
                         Action = new Action
                         {
                             Label = "Когда",

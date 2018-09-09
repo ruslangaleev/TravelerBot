@@ -12,6 +12,6 @@ namespace TravelerBot.Api.Data.Repositories
 
         Task Update(Trip trip);
 
-
+        Task<Trip> Get(int accountVkontakteId);
     }
 }
