@@ -11,5 +11,7 @@ namespace TravelerBot.Api.Data.Repositories
         Task Add(Trip trip);
 
         Task Update(Trip trip);
+
+
     }
 }

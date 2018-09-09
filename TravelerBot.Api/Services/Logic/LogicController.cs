@@ -37,10 +37,16 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Водитель")
             {
-                trips.Add(accountVkontakteId, new Trip
+                _tripRepository.Add(new Trip
                 {
-                    TypeParticipant = TypeParticipant.Driver
+                    TypeParticipant = TypeParticipant.Driver,
+                    AccountId = accountVkontakteId
                 });
+
+                //trips.Add(accountVkontakteId, new Trip
+                //{
+                //    TypeParticipant = TypeParticipant.Driver
+                //});
 
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[]

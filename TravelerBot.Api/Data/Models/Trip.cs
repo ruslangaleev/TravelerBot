@@ -27,5 +27,7 @@ namespace TravelerBot.Api.Data.Models
         public DateTime DateTime { get; set; }
 
         public TimeSpan TimeSpan { get; set; }
+
+        public int AccountId { get; set; }
     }
 }

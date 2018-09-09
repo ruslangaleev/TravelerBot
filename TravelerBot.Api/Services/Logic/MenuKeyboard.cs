@@ -26,7 +26,7 @@ namespace TravelerBot.Api.Services.Logic
                 {
                     new Button
                     {
-                        Color = (inboundButtons.First(t => t.Index == 1) != null) ? "positive" : "default",
+                        Color = (inboundButtons.FirstOrDefault(t => t.Index == 1) != null) ? "positive" : "default",
                         Action = new Action
                         {
                             Label = "Водитель",
@@ -39,7 +39,7 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new Button
                     {
-                        Color = (inboundButtons.First(t => t.Index == 2) != null) ? "positive" : "default",
+                        Color = (inboundButtons.FirstOrDefault(t => t.Index == 2) != null) ? "positive" : "default",
                         Action = new Action
                         {
                             Label = "Пассажир",
@@ -56,10 +56,10 @@ namespace TravelerBot.Api.Services.Logic
                 {
                     new Button
                     {
-                        Color = (inboundButtons.First(t => t.Index == 3) != null) ? "positive" : "default",
+                        Color = (inboundButtons.FirstOrDefault(t => t.Index == 3) != null) ? "positive" : "default",
                         Action = new Action
                         {
-                            Label = (inboundButtons.First(t => t.Index == 3) != null) ? $"Откуда - {inboundButtons.First(t => t.Index == 3).Value}" : "Откуда",
+                            Label = (inboundButtons.FirstOrDefault(t => t.Index == 3) != null) ? $"Откуда - {inboundButtons.First(t => t.Index == 3).Value}" : "Откуда",
                             Type = "text",
                             Payload = JsonConvert.SerializeObject(new
                             {
@@ -69,10 +69,10 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new Button
                     {
-                        Color = (inboundButtons.First(t => t.Index == 4) != null) ? "positive" : "default",
+                        Color = (inboundButtons.FirstOrDefault(t => t.Index == 4) != null) ? "positive" : "default",
                         Action = new Action
                         {
-                            Label = (inboundButtons.First(t => t.Index == 4) != null) ? $"Куда - {inboundButtons.First(t => t.Index == 4)}" : "Куда",
+                            Label = (inboundButtons.FirstOrDefault(t => t.Index == 4) != null) ? $"Куда - {inboundButtons.First(t => t.Index == 4)}" : "Куда",
                             Type = "text",
                             Payload = JsonConvert.SerializeObject(new
                             {
