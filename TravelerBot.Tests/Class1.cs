@@ -96,5 +96,46 @@ namespace TravelerBot.Tests
 
             Assert.AreEqual(date, trip.DateTime);
         }
+
+        [Test]
+        public void ReturnsFrom()
+        {
+            Trip trip = new Trip
+            {
+                TypeParticipant = TypeParticipant.Driver,
+                AccountId = 123456,
+                DateTime = DateTime.Now,
+                From = true
+            };
+
+            var tripRepository = new Mock<ITripRepository>();
+            tripRepository.Setup(t => t.Get(It.IsAny<int>())).ReturnsAsync(trip);
+            tripRepository.Setup(t => t.Update(It.IsAny<Trip>())).Callback((Trip param) =>
+            {
+                trip = param;
+            });
+
+            var logicController = new LogicController(tripRepository.Object);
+
+            var result = logicController.Get("Уфа", 123456);
+
+            // Воидтель
+            Assert.AreEqual(2, result.Keyboard.Buttons[0].Length);
+            // Откуда или куда
+            Assert.AreEqual(2, result.Keyboard.Buttons[1].Length);
+            //Когда и во сколько
+            Assert.AreEqual(2, result.Keyboard.Buttons[2].Length);
+            // На начало
+            Assert.AreEqual(2, result.Keyboard.Buttons[3].Length);
+
+            // Водитель
+            Assert.AreEqual("positive", result.Keyboard.Buttons[0][0].Color);
+
+            // Когда
+            Assert.AreEqual("positive", result.Keyboard.Buttons[2][0].Color);
+
+            // Откуда
+            Assert.AreEqual("positive", result.Keyboard.Buttons[1][0].Color);
+        }
     }
 }

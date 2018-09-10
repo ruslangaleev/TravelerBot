@@ -107,14 +107,28 @@ namespace TravelerBot.Api.Services.Logic
             if (tripp.From)
             {
                 tripp.From = false;
-                tripp.FromString = buttonName;
+                tripp.FromString = (buttonName == "Уфа") ? "Уфа" : "Караидель";
+
+                _tripRepository.Update(tripp);
 
                 var s = new MenuKeyboard();
-                s.Get(new InboundButton[]
+                return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {
                         Index = tripp.TypeParticipant == TypeParticipant.Driver ? 1 : 0
+                    },
+                    new InboundButton
+                    {
+                        Index = string.IsNullOrEmpty(tripp.FromString) ? 0 : 3
+                    },
+                    new InboundButton
+                    {
+                        Index = string.IsNullOrEmpty(tripp.ToToString) ? 0 : 4
+                    },
+                    new InboundButton
+                    {
+                        Index = (tripp.DateTime == null) ? 0 : 5
                     },
                     new InboundButton
                     {
@@ -162,8 +176,6 @@ namespace TravelerBot.Api.Services.Logic
                 }
 
                 _tripRepository.Update(tripp);
-                //var now = (buttonName == "Сегодня") ? DateTime.Now : DateTime.Now.AddDays(1);
-                //tripp.DateTime = now;
 
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[]
