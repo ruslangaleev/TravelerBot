@@ -23,6 +23,8 @@ namespace TravelerBot.Api.Services.Logic
 
         public ResponseModel Get(string buttonName, int accountVkontakteId)
         {
+            var tripp = _tripRepository.Get(accountVkontakteId).GetAwaiter().GetResult();
+
             if (buttonName == "Начать")
             {
                 var s = new TypeParticipantKeyboard();
@@ -93,17 +95,21 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Готово")
             {
-                var trip = trips[accountVkontakteId];
-                if (string.IsNullOrEmpty(trip.FromString) ||
-                   string.IsNullOrEmpty(trip.ToToString) ||
-                   (trip.DateTime == null)||
-                   (trip.TimeSpan == null))
+                if ((tripp.DateTime != null) && (!string.IsNullOrEmpty(tripp.FromString)) 
+                    && (!string.IsNullOrEmpty(tripp.ToToString)) && (tripp.TimeSpan != null))
                 {
-
+                    tripp.IsPublished = true;
+                    _tripRepository.Update(tripp);
+                }
+                else
+                {
+                    return new ResponseModel
+                    {
+                        Message = "Необходимо заполнить поля"
+                    };
                 }
             }
-
-            var tripp = _tripRepository.Get(accountVkontakteId).GetAwaiter().GetResult(); //trips[accountVkontakteId];
+            
             if (tripp.From)
             {
                 tripp.From = false;

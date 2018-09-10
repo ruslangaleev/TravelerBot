@@ -137,5 +137,30 @@ namespace TravelerBot.Tests
             // Откуда
             Assert.AreEqual("positive", result.Keyboard.Buttons[1][0].Color);
         }
+
+        [Test]
+        public void ReturnsError()
+        {
+            Trip trip = new Trip
+            {
+                TypeParticipant = TypeParticipant.Driver,
+                AccountId = 123456,
+                DateTime = DateTime.Now,
+                TimeSpan = new TimeSpan(18, 00, 00)
+            };
+
+            var tripRepository = new Mock<ITripRepository>();
+            tripRepository.Setup(t => t.Get(It.IsAny<int>())).ReturnsAsync(trip);
+            tripRepository.Setup(t => t.Update(It.IsAny<Trip>())).Callback((Trip param) =>
+            {
+                trip = param;
+            });
+
+            var logicController = new LogicController(tripRepository.Object);
+
+            var result = logicController.Get("Готово", 123456);
+
+            Assert.AreEqual("Необходимо заполнить поля", result.Message);
+        }
     }
 }

@@ -29,5 +29,10 @@ namespace TravelerBot.Api.Data.Models
         public TimeSpan? TimeSpan { get; set; }
 
         public int AccountId { get; set; }
+
+        /// <summary>
+        /// Опубликовано ли объявление?
+        /// </summary>
+        public bool IsPublished { get; set; }
     }
 }
