@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelerBot.Api", "TravelerBot.Api\TravelerBot.Api.csproj", "{B161FB5B-63D3-42D0-8348-3C325133D7C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelerBot.Tests", "TravelerBot.Tests\TravelerBot.Tests.csproj", "{CEBF93BD-ED30-4B76-BC55-85EB9B7DF1F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelerBot.Tests", "TravelerBot.Tests\TravelerBot.Tests.csproj", "{CEBF93BD-ED30-4B76-BC55-85EB9B7DF1F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelerBot.MVC", "TravelerBot.MVC\TravelerBot.MVC.csproj", "{A1229ABA-C668-4A21-845B-7D0761AB6E34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{CEBF93BD-ED30-4B76-BC55-85EB9B7DF1F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEBF93BD-ED30-4B76-BC55-85EB9B7DF1F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEBF93BD-ED30-4B76-BC55-85EB9B7DF1F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1229ABA-C668-4A21-845B-7D0761AB6E34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1229ABA-C668-4A21-845B-7D0761AB6E34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1229ABA-C668-4A21-845B-7D0761AB6E34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1229ABA-C668-4A21-845B-7D0761AB6E34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
