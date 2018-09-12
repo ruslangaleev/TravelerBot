@@ -191,6 +191,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Data\Models\TypeTransaction.cs" />
     <Compile Include="Data\Repositories\Interfaces\ITripRepository.cs" />
     <Compile Include="Data\Repositories\Logic\TripRepository.cs" />
     <Compile Include="Data\TripContext.cs" />
@@ -199,6 +200,15 @@
     </Compile>
     <Compile Include="Data\Models\Trip.cs" />
     <Compile Include="Data\Models\TypeParticipant.cs" />
+    <Compile Include="Migrations\201809121042459_InitialCreate.cs" />
+    <Compile Include="Migrations\201809121042459_InitialCreate.Designer.cs">
+      <DependentUpon>201809121042459_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809121943308_Initial.cs" />
+    <Compile Include="Migrations\201809121943308_Initial.Designer.cs">
+      <DependentUpon>201809121943308_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceModels\InboundButton.cs" />
     <Compile Include="ResourceModels\Keyboard.cs" />
@@ -211,6 +221,7 @@
     <Compile Include="Services\Logic\MenuKeyboard.cs" />
     <Compile Include="Services\Logic\OptionKeyboard.cs" />
     <Compile Include="Services\Logic\PointKeyboard.cs" />
+    <Compile Include="Services\Logic\SearchMenuKeyboard.cs" />
     <Compile Include="Services\Logic\TimeKeyboard.cs" />
     <Compile Include="Services\Logic\TypeParticipantKeyboard.cs" />
   </ItemGroup>
@@ -253,9 +264,17 @@
     </Content>
     <Content Include="Areas\HelpPage\Views\_ViewStart.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201809121042459_InitialCreate.resx">
+      <DependentUpon>201809121042459_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809121943308_Initial.resx">
+      <DependentUpon>201809121943308_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

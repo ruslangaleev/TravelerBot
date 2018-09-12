@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TravelerBot.Api.Data.Repositories;
 using TravelerBot.Api.ResourceModels;
 using TravelerBot.MVC.Models;
@@ -18,32 +19,177 @@ namespace TravelerBot.Api.Services.Logic
 
         public ResponseModel Get(string buttonName, int accountVkontakteId)
         {
-            var tripp = _tripRepository.Get(accountVkontakteId);
-
             if (buttonName == "Начать")
             {
                 var s = new OptionKeyboard();
                 return s.Get();
             }
 
-            if (buttonName == "Добавить поездку")
+            var trips = _tripRepository.Get(accountVkontakteId);
+            var trip = trips.FirstOrDefault();
+            if (trip != null)
             {
-                var s = new TypeParticipantKeyboard();
+                if (trip.TypeTransaction == MVC.Data.Models.TypeTransaction.Search)
+                {
+                    if (buttonName == "Добавить поездку")
+                    {
+                        _tripRepository.Delete(trip.TripId);
+                        return AddTrip(buttonName, accountVkontakteId);
+                    }
+
+                    return SearchTrips(buttonName, accountVkontakteId, trip);
+                }
+                else
+                {
+                    if (buttonName == "Найти поездку")
+                    {
+                        _tripRepository.Delete(trip.TripId);
+                    }
+
+                    return AddTrip(buttonName, accountVkontakteId, trip);
+                }
+            }
+            else
+            {
+                if (buttonName == "Добавить поездку")
+                {
+                    return AddTrip(buttonName, accountVkontakteId);
+                }
+                else
+                {
+                    return SearchTrips(buttonName, accountVkontakteId);
+                }
+            }
+        }
+
+        private ResponseModel SearchTrips(string buttonName, int accountVkontakteId, Trip trip = null)
+        {
+            if (trip == null)
+            {
+                _tripRepository.Add(new Trip
+                {
+                    TripId = Guid.NewGuid(),
+                    AccountId = accountVkontakteId,
+                    TypeTransaction = MVC.Data.Models.TypeTransaction.Search
+                });
+
+                var keyboard = new SearchMenuKeyboard();
+                return keyboard.Get();
+            }
+
+            if (buttonName == "Откуда")
+            {
+                trip.From = true;
+                _tripRepository.Update(trip);
+
+                var s = new PointKeyboard();
                 return s.Get();
             }
 
-            if (buttonName == "Водитель")
+            if (buttonName == "Куда")
             {
-                if (tripp != null)
+                trip.To = true;
+                _tripRepository.Update(trip);
+
+                var s = new PointKeyboard();
+                return s.Get();
+            }
+
+            if (buttonName == "Когда")
+            {
+                trip.Date = true;
+                _tripRepository.Update(trip);
+
+                var s = new DateKeyboard();
+                return s.Get();
+            }
+
+            if (buttonName == "Показать")
+            {
+                var trips = _tripRepository.Get(trip.FromString, trip.ToToString, trip.DateTime);
+
+                if (trips.Count() == 0)
                 {
-                    _tripRepository.Delete(tripp.TripId);
+                    return new ResponseModel
+                    {
+                        Message = "Объявлений не найдено"
+                    };
+                }
+
+                var tripsAsString = trips.Select(t =>
+                {
+                    return $"Кто: {t.AccountId}";
+                });
+
+                var message = string.Join("\r\n\r\n", tripsAsString);
+
+                return new ResponseModel
+                {
+                    Message = message
+                };
+            }
+
+            if (trip.From)
+            {
+                trip.From = false;
+                trip.FromString = (buttonName == "Уфа") ? "Уфа" : "Караидель";
+
+                _tripRepository.Update(trip);
+
+                var s = new SearchMenuKeyboard();
+                return s.Get();
+            }
+
+            if (trip.To)
+            {
+                trip.To = false;
+                trip.ToToString = buttonName;
+
+                _tripRepository.Update(trip);
+
+                var s = new SearchMenuKeyboard();
+                return s.Get();
+            }
+
+            if (trip.Date)
+            {
+                trip.Date = false;
+                switch (buttonName)
+                {
+                    case "Сегодня":
+                        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                        break;
+                    case "Завтра":
+                        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1);
+                        break;
+                    default:
+                        throw new ArgumentException("Необходимо указать дату");
+                }
+
+                _tripRepository.Update(trip);
+
+                var s = new SearchMenuKeyboard();
+                return s.Get();
+            }
+
+            return null;
+        }
+
+        private ResponseModel AddTrip(string buttonName, int accountVkontakteId, Trip trip = null)
+        {
+            if (buttonName == "Добавить поездку")
+            {
+                if (trip != null)
+                {
+                    _tripRepository.Delete(trip.TripId);
                 }
 
                 _tripRepository.Add(new Trip
                 {
                     TripId = Guid.NewGuid(),
                     TypeParticipant = TypeParticipant.Driver,
-                    AccountId = accountVkontakteId
+                    AccountId = accountVkontakteId,
+                    TypeTransaction = MVC.Data.Models.TypeTransaction.Adding
                 });
 
                 var s = new MenuKeyboard();
@@ -58,8 +204,8 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Откуда")
             {
-                tripp.From = true;
-                _tripRepository.Update(tripp);
+                trip.From = true;
+                _tripRepository.Update(trip);
 
                 var s = new PointKeyboard();
                 return s.Get();
@@ -67,8 +213,8 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Куда")
             {
-                tripp.To = true;
-                _tripRepository.Update(tripp);
+                trip.To = true;
+                _tripRepository.Update(trip);
 
                 var s = new PointKeyboard();
                 return s.Get();
@@ -76,8 +222,8 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Когда")
             {
-                tripp.Date = true;
-                _tripRepository.Update(tripp);
+                trip.Date = true;
+                _tripRepository.Update(trip);
 
                 var s = new DateKeyboard();
                 return s.Get();
@@ -85,8 +231,8 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Во сколько")
             {
-                tripp.Time = true;
-                _tripRepository.Update(tripp);
+                trip.Time = true;
+                _tripRepository.Update(trip);
 
                 var s = new TimeKeyboard();
                 return s.Get();
@@ -94,11 +240,11 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Готово")
             {
-                if ((tripp.DateTime != null) && (!string.IsNullOrEmpty(tripp.FromString)) 
-                    && (!string.IsNullOrEmpty(tripp.ToToString)) && (tripp.TimeSpan != null))
+                if ((trip.DateTime != null) && (!string.IsNullOrEmpty(trip.FromString))
+                    && (!string.IsNullOrEmpty(trip.ToToString)) && (trip.TimeSpan != null))
                 {
-                    tripp.IsPublished = true;
-                    _tripRepository.Update(tripp);
+                    trip.IsPublished = true;
+                    _tripRepository.Update(trip);
 
                     var s = new OptionKeyboard();
                     return s.Get("Объявление успешно добавлено");
@@ -111,32 +257,32 @@ namespace TravelerBot.Api.Services.Logic
                     };
                 }
             }
-            
-            if (tripp.From)
-            {
-                tripp.From = false;
-                tripp.FromString = (buttonName == "Уфа") ? "Уфа" : "Караидель";
 
-                _tripRepository.Update(tripp);
+            if (trip.From)
+            {
+                trip.From = false;
+                trip.FromString = (buttonName == "Уфа") ? "Уфа" : "Караидель";
+
+                _tripRepository.Update(trip);
 
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {
-                        Index = tripp.TypeParticipant == TypeParticipant.Driver ? 1 : 0
+                        Index = trip.TypeParticipant == TypeParticipant.Driver ? 1 : 0
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(tripp.FromString) ? 0 : 3
+                        Index = string.IsNullOrEmpty(trip.FromString) ? 0 : 3
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(tripp.ToToString) ? 0 : 4
+                        Index = string.IsNullOrEmpty(trip.ToToString) ? 0 : 4
                     },
                     new InboundButton
                     {
-                        Index = (tripp.DateTime == null) ? 0 : 5
+                        Index = (trip.DateTime == null) ? 0 : 5
                     },
                     new InboundButton
                     {
@@ -145,23 +291,23 @@ namespace TravelerBot.Api.Services.Logic
                 });
             }
 
-            if (tripp.To)
+            if (trip.To)
             {
-                tripp.To = false;
-                tripp.ToToString = buttonName;
+                trip.To = false;
+                trip.ToToString = buttonName;
 
-                _tripRepository.Update(tripp);
+                _tripRepository.Update(trip);
 
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {
-                        Index = tripp.TypeParticipant == TypeParticipant.Driver ? 1 : 0
+                        Index = trip.TypeParticipant == TypeParticipant.Driver ? 1 : 0
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(tripp.FromString) ? 0 : 3
+                        Index = string.IsNullOrEmpty(trip.FromString) ? 0 : 3
                     },
                     new InboundButton
                     {
@@ -170,37 +316,37 @@ namespace TravelerBot.Api.Services.Logic
                 });
             }
 
-            if (tripp.Date)
+            if (trip.Date)
             {
-                tripp.Date = false;
-                switch(buttonName)
+                trip.Date = false;
+                switch (buttonName)
                 {
                     case "Сегодня":
-                        tripp.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
                         break;
                     case "Завтра":
-                        tripp.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1);
+                        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1);
                         break;
                     default:
                         throw new ArgumentException("Необходимо указать дату");
                 }
 
-                _tripRepository.Update(tripp);
+                _tripRepository.Update(trip);
 
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {
-                        Index = tripp.TypeParticipant == TypeParticipant.Driver ? 1 : 0
+                        Index = trip.TypeParticipant == TypeParticipant.Driver ? 1 : 0
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(tripp.FromString) ? 0 : 3
+                        Index = string.IsNullOrEmpty(trip.FromString) ? 0 : 3
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(tripp.ToToString) ? 0 : 4
+                        Index = string.IsNullOrEmpty(trip.ToToString) ? 0 : 4
                     },
                     new InboundButton
                     {
@@ -209,32 +355,32 @@ namespace TravelerBot.Api.Services.Logic
                 });
             }
 
-            if (tripp.Time)
+            if (trip.Time)
             {
-                tripp.Time = false;
+                trip.Time = false;
                 var timespan = TimeSpan.Parse(buttonName);
 
-                tripp.TimeSpan = timespan;
-                _tripRepository.Update(tripp);
+                trip.TimeSpan = timespan;
+                _tripRepository.Update(trip);
 
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {
-                        Index = tripp.TypeParticipant == TypeParticipant.Driver ? 1 : 0
+                        Index = trip.TypeParticipant == TypeParticipant.Driver ? 1 : 0
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(tripp.FromString) ? 0 : 3
+                        Index = string.IsNullOrEmpty(trip.FromString) ? 0 : 3
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(tripp.ToToString) ? 0 : 4
+                        Index = string.IsNullOrEmpty(trip.ToToString) ? 0 : 4
                     },
                     new InboundButton
                     {
-                        Index = (tripp.DateTime == null) ? 0 : 5
+                        Index = (trip.DateTime == null) ? 0 : 5
                     },
                     new InboundButton
                     {

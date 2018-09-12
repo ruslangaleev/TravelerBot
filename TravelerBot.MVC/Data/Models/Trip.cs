@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using TravelerBot.MVC.Data.Models;
 
 namespace TravelerBot.MVC.Models
 {
@@ -36,5 +37,7 @@ namespace TravelerBot.MVC.Models
         /// Опубликовано ли объявление?
         /// </summary>
         public bool IsPublished { get; set; }
+
+        public TypeTransaction TypeTransaction { get; set; }
     }
 }

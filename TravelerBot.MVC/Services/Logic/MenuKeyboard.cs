@@ -164,7 +164,7 @@ namespace TravelerBot.Api.Services.Logic
                 OneTime = false,
                 buttons = new[]
                 {
-                    buttons,
+                    //buttons,
                     buttonsFromTo,
                     buttonsDateTime,
                     startKeyboard
