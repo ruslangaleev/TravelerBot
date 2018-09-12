@@ -209,6 +209,7 @@
     <Compile Include="Services\Logic\ErrorKeyboard.cs" />
     <Compile Include="Services\Logic\LogicController.cs" />
     <Compile Include="Services\Logic\MenuKeyboard.cs" />
+    <Compile Include="Services\Logic\OptionKeyboard.cs" />
     <Compile Include="Services\Logic\PointKeyboard.cs" />
     <Compile Include="Services\Logic\TimeKeyboard.cs" />
     <Compile Include="Services\Logic\TypeParticipantKeyboard.cs" />

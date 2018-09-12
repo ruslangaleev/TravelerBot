@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TravelerBot.Api.Data.Repositories;
 using TravelerBot.Api.ResourceModels;
 using TravelerBot.MVC.Models;
+using TravelerBot.MVC.Services.Logic;
 
 namespace TravelerBot.Api.Services.Logic
 {
@@ -21,14 +22,14 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Начать")
             {
-                var s = new TypeParticipantKeyboard();
+                var s = new OptionKeyboard();
                 return s.Get();
             }
 
             if (buttonName == "Добавить поездку")
             {
-                var s = new MenuKeyboard();
-                return s.Get(new InboundButton[] { });
+                var s = new TypeParticipantKeyboard();
+                return s.Get();
             }
 
             if (buttonName == "Водитель")

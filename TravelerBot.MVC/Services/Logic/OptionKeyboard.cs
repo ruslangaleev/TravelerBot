@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using TravelerBot.Api.ResourceModels;
 using TravelerBot.Api.Services.Interfaces;
 
-namespace TravelerBot.Api.Services.Logic
+namespace TravelerBot.MVC.Services.Logic
 {
-    public class TypeParticipantKeyboard : IKeyboard
+    public class OptionKeyboard : IKeyboard
     {
         public ResponseModel Get()
         {
@@ -18,7 +20,7 @@ namespace TravelerBot.Api.Services.Logic
                         color = "default",
                         action = new Action
                         {
-                            label = "Водитель",
+                            label = "Найти поездку",
                             type = "text",
                             payload = JsonConvert.SerializeObject(new
                             {
@@ -31,7 +33,7 @@ namespace TravelerBot.Api.Services.Logic
                         color = "default",
                         action = new Action
                         {
-                            label = "Пассажир",
+                            label = "Добавить поездку",
                             type = "text",
                             payload = JsonConvert.SerializeObject(new
                             {
