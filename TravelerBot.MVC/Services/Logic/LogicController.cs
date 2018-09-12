@@ -15,9 +15,6 @@ namespace TravelerBot.Api.Services.Logic
             _tripRepository = tripRepository;
         }
 
-        // Временный словарь
-        private readonly Dictionary<int, Trip> trips = new Dictionary<int, Trip>();
-
         public ResponseModel Get(string buttonName, int accountVkontakteId)
         {
             var tripp = _tripRepository.Get(accountVkontakteId);
@@ -28,7 +25,7 @@ namespace TravelerBot.Api.Services.Logic
                 return s.Get();
             }
 
-            if (buttonName == "Добавить поздку")
+            if (buttonName == "Добавить поездку")
             {
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[] { });
@@ -43,11 +40,6 @@ namespace TravelerBot.Api.Services.Logic
                     AccountId = accountVkontakteId
                 });
 
-                //trips.Add(accountVkontakteId, new Trip
-                //{
-                //    TypeParticipant = TypeParticipant.Driver
-                //});
-
                 var s = new MenuKeyboard();
                 return s.Get(new InboundButton[]
                 {
@@ -60,8 +52,6 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Откуда")
             {
-                //var trip = trips[accountVkontakteId];
-                //trip.From = true;
                 tripp.From = true;
                 _tripRepository.Update(tripp);
 
@@ -71,14 +61,17 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Куда")
             {
-                var trip = trips[accountVkontakteId];
-                trip.To = true;
+                tripp.To = true;
+                _tripRepository.Update(tripp);
+
+                var s = new PointKeyboard();
+                return s.Get();
             }
 
             if (buttonName == "Когда")
             {
-                var trip = trips[accountVkontakteId];
-                trip.Date = true;
+                tripp.Date = true;
+                _tripRepository.Update(tripp);
 
                 var s = new DateKeyboard();
                 return s.Get();
@@ -86,8 +79,8 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Во сколько")
             {
-                var trip = trips[accountVkontakteId];
-                trip.Time = true;
+                tripp.Time = true;
+                _tripRepository.Update(tripp);
 
                 var s = new TimeKeyboard();
                 return s.Get();
@@ -100,6 +93,9 @@ namespace TravelerBot.Api.Services.Logic
                 {
                     tripp.IsPublished = true;
                     _tripRepository.Update(tripp);
+
+                    var s = new TypeParticipantKeyboard();
+                    return s.Get();
                 }
                 else
                 {
@@ -148,8 +144,10 @@ namespace TravelerBot.Api.Services.Logic
                 tripp.To = false;
                 tripp.ToToString = buttonName;
 
+                _tripRepository.Update(tripp);
+
                 var s = new MenuKeyboard();
-                s.Get(new InboundButton[]
+                return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {
@@ -208,11 +206,13 @@ namespace TravelerBot.Api.Services.Logic
             if (tripp.Time)
             {
                 tripp.Time = false;
-
                 var timespan = TimeSpan.Parse(buttonName);
 
+                tripp.TimeSpan = timespan;
+                _tripRepository.Update(tripp);
+
                 var s = new MenuKeyboard();
-                s.Get(new InboundButton[]
+                return s.Get(new InboundButton[]
                 {
                     new InboundButton
                     {

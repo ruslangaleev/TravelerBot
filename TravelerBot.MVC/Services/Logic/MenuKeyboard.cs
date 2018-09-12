@@ -59,7 +59,7 @@ namespace TravelerBot.Api.Services.Logic
                         color = (inboundButtons.FirstOrDefault(t => t.Index == 3) != null) ? "positive" : "default",
                         action = new Action
                         {
-                            label = (inboundButtons.FirstOrDefault(t => t.Index == 3) != null) ? $"Откуда - {inboundButtons.First(t => t.Index == 3).Value}" : "Откуда",
+                            label = (inboundButtons.FirstOrDefault(t => t.Index == 3) != null) ? $"Откуда" : "Откуда",
                             type = "text",
                             payload = JsonConvert.SerializeObject(new
                             {
@@ -72,7 +72,7 @@ namespace TravelerBot.Api.Services.Logic
                         color = (inboundButtons.FirstOrDefault(t => t.Index == 4) != null) ? "positive" : "default",
                         action = new Action
                         {
-                            label = (inboundButtons.FirstOrDefault(t => t.Index == 4) != null) ? $"Куда - {inboundButtons.First(t => t.Index == 4)}" : "Куда",
+                            label = (inboundButtons.FirstOrDefault(t => t.Index == 4) != null) ? $"Куда" : "Куда",
                             type = "text",
                             payload = JsonConvert.SerializeObject(new
                             {
@@ -99,7 +99,7 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new Button
                     {
-                        color = "default",
+                        color = (inboundButtons.FirstOrDefault(t => t.Index == 6) != null) ? "positive" : "default",
                         action = new Action
                         {
                             label = "Во сколько",
