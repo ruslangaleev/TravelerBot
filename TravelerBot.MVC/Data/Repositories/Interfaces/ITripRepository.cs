@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using TravelerBot.MVC.Models;
 
 namespace TravelerBot.Api.Data.Repositories
@@ -10,5 +11,7 @@ namespace TravelerBot.Api.Data.Repositories
         void Update(Trip trip);
 
         Trip Get(int accountVkontakteId);
+
+        void Delete(Guid tripId);
     }
 }

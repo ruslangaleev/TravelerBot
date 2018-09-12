@@ -75,7 +75,10 @@ namespace TravelerBot.MVC.Services.Logic
 
         public ResponseModel Get(string buttonName)
         {
-            throw new System.NotImplementedException();
+            var result = Get();
+            result.Message = buttonName;
+
+            return result;
         }
 
         public ResponseModel Get(InboundButton[] inboundButtons)

@@ -34,6 +34,11 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Водитель")
             {
+                if (tripp != null)
+                {
+                    _tripRepository.Delete(tripp.TripId);
+                }
+
                 _tripRepository.Add(new Trip
                 {
                     TripId = Guid.NewGuid(),
@@ -95,8 +100,8 @@ namespace TravelerBot.Api.Services.Logic
                     tripp.IsPublished = true;
                     _tripRepository.Update(tripp);
 
-                    var s = new TypeParticipantKeyboard();
-                    return s.Get();
+                    var s = new OptionKeyboard();
+                    return s.Get("Объявление успешно добавлено");
                 }
                 else
                 {

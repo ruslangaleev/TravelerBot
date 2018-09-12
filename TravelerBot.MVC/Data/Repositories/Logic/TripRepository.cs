@@ -14,7 +14,7 @@ namespace TravelerBot.MVC.Data.Repositories
 
         public Trip Get(int accountId)
         {
-            return tripContext.Trips.FirstOrDefault(t => t.AccountId == accountId);
+            return tripContext.Trips.FirstOrDefault(t => t.AccountId == accountId && t.IsPublished == false);
         }
 
         public void Add(Trip trip)
@@ -27,6 +27,15 @@ namespace TravelerBot.MVC.Data.Repositories
         {
             tripContext.Entry(trip).State = System.Data.Entity.EntityState.Modified;
             tripContext.SaveChanges();
+        }
+
+        public void Delete(Guid tripId)
+        {
+            var trip = tripContext.Trips.Find(tripId);
+            if (trip != null)
+            {
+                tripContext.Trips.Remove(trip);
+            }
         }
 
         //protected override void Dispose(bool disposing)
