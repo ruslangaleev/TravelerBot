@@ -18,12 +18,12 @@ namespace TravelerBot.Api.Services.Logic
                 {
                     new Button
                     {
-                        Color = "default",
-                        Action = new ResourceModels.Action
+                        color = "default",
+                        action = new ResourceModels.Action
                         {
-                            Label = "Уфа",
-                            Type = "text",
-                            Payload = JsonConvert.SerializeObject(new
+                            label = "Уфа",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
                             {
                                 button = "1"
                             })
@@ -31,12 +31,12 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new Button
                     {
-                        Color = "default",
-                        Action = new ResourceModels.Action
+                        color = "default",
+                        action = new ResourceModels.Action
                         {
-                            Label = "Караидель",
-                            Type = "text",
-                            Payload = JsonConvert.SerializeObject(new
+                            label = "Караидель",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
                             {
                                 button = "2"
                             })
@@ -48,12 +48,12 @@ namespace TravelerBot.Api.Services.Logic
                     {
                         new Button
                         {
-                            Color = "default",
-                            Action = new ResourceModels.Action
+                            color = "default",
+                            action = new ResourceModels.Action
                             {
-                                Label = "Перейти на начало",
-                                Type = "text",
-                                Payload = JsonConvert.SerializeObject(new
+                                label = "Перейти на начало",
+                                type = "text",
+                                payload = JsonConvert.SerializeObject(new
                                 {
                                     button = "3"
                                 })
@@ -64,7 +64,7 @@ namespace TravelerBot.Api.Services.Logic
             var keyboard = new Keyboard
             {
                 OneTime = false,
-                Buttons = new[] { buttons, startKeyboard }
+                buttons = new[] { buttons, startKeyboard }
             };
 
             return new ResponseModel

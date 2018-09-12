@@ -7,22 +7,22 @@ namespace TravelerBot.Api.ResourceModels
         [JsonProperty("one_time")]
         public bool OneTime { get; set; }
 
-        public Button[][] Buttons { get; set; }
+        public Button[][] buttons { get; set; }
     }
 
     public class Button
     {
-        public Action Action { get; set; }
+        public Action action { get; set; }
 
-        public string Color { get; set; }
+        public string color { get; set; }
     }
 
     public class Action
     {
-        public string Type { get; set; }
+        public string type { get; set; }
 
-        public string Payload { get; set; }
+        public string payload { get; set; }
 
-        public string Label { get; set; }
+        public string label { get; set; }
     }
 }

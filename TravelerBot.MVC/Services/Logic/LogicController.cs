@@ -20,7 +20,7 @@ namespace TravelerBot.Api.Services.Logic
 
         public ResponseModel Get(string buttonName, int accountVkontakteId)
         {
-            var tripp = _tripRepository.Get(accountVkontakteId); ;
+            var tripp = _tripRepository.Get(accountVkontakteId);
 
             if (buttonName == "Начать")
             {
@@ -38,6 +38,7 @@ namespace TravelerBot.Api.Services.Logic
             {
                 _tripRepository.Add(new Trip
                 {
+                    TripId = Guid.NewGuid(),
                     TypeParticipant = TypeParticipant.Driver,
                     AccountId = accountVkontakteId
                 });
@@ -59,8 +60,10 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Откуда")
             {
-                var trip = trips[accountVkontakteId];
-                trip.From = true;
+                //var trip = trips[accountVkontakteId];
+                //trip.From = true;
+                tripp.From = true;
+                _tripRepository.Update(tripp);
 
                 var s = new PointKeyboard();
                 return s.Get();

@@ -202,6 +202,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceModels\InboundButton.cs" />
     <Compile Include="ResourceModels\Keyboard.cs" />
+    <Compile Include="ResourceModels\Message.cs" />
     <Compile Include="ResourceModels\ResponseModel.cs" />
     <Compile Include="Services\Interfaces\IKeyboard.cs" />
     <Compile Include="Services\Logic\DateKeyboard.cs" />
