@@ -191,6 +191,8 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Data\Repositories\Interfaces\ITripRepository.cs" />
+    <Compile Include="Data\Repositories\Logic\TripRepository.cs" />
     <Compile Include="Data\TripContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -198,8 +200,23 @@
     <Compile Include="Data\Models\Trip.cs" />
     <Compile Include="Data\Models\TypeParticipant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceModels\InboundButton.cs" />
+    <Compile Include="ResourceModels\Keyboard.cs" />
+    <Compile Include="ResourceModels\ResponseModel.cs" />
+    <Compile Include="Services\Interfaces\IKeyboard.cs" />
+    <Compile Include="Services\Logic\DateKeyboard.cs" />
+    <Compile Include="Services\Logic\ErrorKeyboard.cs" />
+    <Compile Include="Services\Logic\LogicController.cs" />
+    <Compile Include="Services\Logic\MenuKeyboard.cs" />
+    <Compile Include="Services\Logic\PointKeyboard.cs" />
+    <Compile Include="Services\Logic\TimeKeyboard.cs" />
+    <Compile Include="Services\Logic\TypeParticipantKeyboard.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\Trips.mdf" />
+    <Content Include="App_Data\Trips_log.ldf">
+      <DependentUpon>Trips.mdf</DependentUpon>
+    </Content>
     <Content Include="Areas\HelpPage\HelpPage.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -234,9 +251,7 @@
     </Content>
     <Content Include="Areas\HelpPage\Views\_ViewStart.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
