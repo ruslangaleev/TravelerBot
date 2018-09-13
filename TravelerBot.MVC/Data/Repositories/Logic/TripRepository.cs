@@ -31,6 +31,7 @@ namespace TravelerBot.MVC.Data.Repositories
             if (trip != null)
             {
                 tripContext.Trips.Remove(trip);
+                tripContext.SaveChanges();
             }
         }
 

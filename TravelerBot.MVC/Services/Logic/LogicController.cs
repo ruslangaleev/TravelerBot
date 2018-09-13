@@ -37,6 +37,12 @@ namespace TravelerBot.Api.Services.Logic
                         return AddTrip(buttonName, accountVkontakteId);
                     }
 
+                    if (buttonName == "Найти поездку")
+                    {
+                        _tripRepository.Delete(trip.TripId);
+                        return SearchTrips(buttonName, accountVkontakteId);
+                    }
+
                     return SearchTrips(buttonName, accountVkontakteId, trip);
                 }
                 else
@@ -55,11 +61,13 @@ namespace TravelerBot.Api.Services.Logic
                 {
                     return AddTrip(buttonName, accountVkontakteId);
                 }
-                else
+                if (buttonName == "Найти поездку")
                 {
                     return SearchTrips(buttonName, accountVkontakteId);
                 }
             }
+
+            return null;
         }
 
         private ResponseModel SearchTrips(string buttonName, int accountVkontakteId, Trip trip = null)
@@ -380,17 +388,35 @@ namespace TravelerBot.Api.Services.Logic
             if (trip.Date)
             {
                 trip.Date = false;
-                switch (buttonName)
+
+                if (buttonName == "Сегодня" && trip.TimeSpan == null)
                 {
-                    case "Сегодня":
-                        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
-                        break;
-                    case "Завтра":
-                        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1);
-                        break;
-                    default:
-                        throw new ArgumentException("Необходимо указать дату");
+                    trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
                 }
+                if (buttonName == "Сегодня" && trip.TimeSpan != null)
+                {
+                    trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, ((TimeSpan)trip.TimeSpan).Hours, ((TimeSpan)trip.TimeSpan).Minutes, 0);
+                }
+                if (buttonName == "Завтра" && trip.TimeSpan == null)
+                {
+                    trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1);
+                }
+                if (buttonName == "Завтра" && trip.TimeSpan != null)
+                {
+                    trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, ((TimeSpan)trip.TimeSpan).Hours, ((TimeSpan)trip.TimeSpan).Minutes, 0).AddDays(1);
+                }
+
+                //switch (buttonName)
+                //{
+                //    case "Сегодня":
+                //        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                //        break;
+                //    case "Завтра":
+                //        trip.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1);
+                //        break;
+                //    default:
+                //        throw new ArgumentException("Необходимо указать дату");
+                //}
 
                 _tripRepository.Update(trip);
 
