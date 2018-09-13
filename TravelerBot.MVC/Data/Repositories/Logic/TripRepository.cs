@@ -59,10 +59,15 @@ namespace TravelerBot.MVC.Data.Repositories
             if (whenn != null)
             {
                 var when = (DateTime)whenn;
-                var dateStart = new DateTime(when.Year, when.Month, when.Day, 0, 0, 0);
+                var dateStart = new DateTime(when.Year, when.Month, when.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
                 var dateEnd = new DateTime(when.Year, when.Month, when.Day, 23, 59, 59);
 
                 query = query.Where(t => t.DateTime >= dateStart && t.DateTime <= dateEnd);
+            }
+            else
+            {
+                var when = DateTime.Now;
+                query = query.Where(t => t.DateTime >= when);
             }
             return query.ToList();
         }

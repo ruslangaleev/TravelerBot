@@ -77,6 +77,12 @@ namespace TravelerBot.Api.Services.Logic
                 return keyboard.Get();
             }
 
+            if (buttonName == "Найти поездку")
+            {
+                var keyboard = new SearchMenuKeyboard();
+                return keyboard.Get();
+            }
+
             if (buttonName == "Откуда")
             {
                 trip.From = true;
@@ -137,7 +143,21 @@ namespace TravelerBot.Api.Services.Logic
                 _tripRepository.Update(trip);
 
                 var s = new SearchMenuKeyboard();
-                return s.Get();
+                return s.Get(new InboundButton[]
+                    {
+                        new InboundButton
+                        {
+                            Index = 3
+                        },
+                        new InboundButton
+                        {
+                            Index = (string.IsNullOrEmpty(trip.ToToString)) ? 0 : 4
+                        },
+                        new InboundButton
+                        {
+                            Index = (trip.DateTime == null) ? 0 : 5
+                        }
+                    });
             }
 
             if (trip.To)
@@ -148,7 +168,21 @@ namespace TravelerBot.Api.Services.Logic
                 _tripRepository.Update(trip);
 
                 var s = new SearchMenuKeyboard();
-                return s.Get();
+                return s.Get(new InboundButton[]
+                    {
+                        new InboundButton
+                        {
+                            Index = (string.IsNullOrEmpty(trip.FromString)) ? 0 : 3
+                        },
+                        new InboundButton
+                        {
+                            Index = 4
+                        },
+                        new InboundButton
+                        {
+                            Index = (trip.DateTime == null) ? 0 : 5
+                        }
+                    });
             }
 
             if (trip.Date)
@@ -169,7 +203,21 @@ namespace TravelerBot.Api.Services.Logic
                 _tripRepository.Update(trip);
 
                 var s = new SearchMenuKeyboard();
-                return s.Get();
+                return s.Get(new InboundButton[]
+                    {
+                        new InboundButton
+                        {
+                            Index = (string.IsNullOrEmpty(trip.FromString)) ? 0 : 3
+                        },
+                        new InboundButton
+                        {
+                            Index = (string.IsNullOrEmpty(trip.ToToString)) ? 0 : 4
+                        },
+                        new InboundButton
+                        {
+                            Index = 5
+                        }
+                    });
             }
 
             return null;
@@ -247,7 +295,12 @@ namespace TravelerBot.Api.Services.Logic
                     _tripRepository.Update(trip);
 
                     var s = new OptionKeyboard();
-                    return s.Get("Объявление успешно добавлено");
+                    
+                    return s.Get("Объявление успешно опубликовано:\r\n" +
+                        "Водитель\r\n" +
+                        $"{trip.FromString} - {trip.ToToString}" +
+                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"{((TimeSpan)trip.TimeSpan).ToString("HH:mm")}");
                 }
                 else
                 {
