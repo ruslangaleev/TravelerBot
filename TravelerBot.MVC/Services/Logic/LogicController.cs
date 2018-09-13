@@ -19,7 +19,7 @@ namespace TravelerBot.Api.Services.Logic
 
         public ResponseModel Get(string buttonName, int accountVkontakteId)
         {
-            if (buttonName == "Начать")
+            if (buttonName == "Начать" || buttonName == "Перейти на начало")
             {
                 var s = new OptionKeyboard();
                 return s.Get();
@@ -295,12 +295,12 @@ namespace TravelerBot.Api.Services.Logic
                     _tripRepository.Update(trip);
 
                     var s = new OptionKeyboard();
-                    
+
                     return s.Get("Объявление успешно опубликовано:\r\n" +
                         "Водитель\r\n" +
-                        $"{trip.FromString} - {trip.ToToString}" +
+                        $"{trip.FromString} - {trip.ToToString}\r\n" +
                         $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                        $"{((TimeSpan)trip.TimeSpan).ToString("HH:mm")}");
+                        $"{((TimeSpan)trip.TimeSpan).ToString(@"hh\:mm")}");
                 }
                 else
                 {
@@ -327,7 +327,7 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new InboundButton
                     {
-                        Index = string.IsNullOrEmpty(trip.FromString) ? 0 : 3
+                        Index = 3
                     },
                     new InboundButton
                     {
@@ -339,8 +339,8 @@ namespace TravelerBot.Api.Services.Logic
                     },
                     new InboundButton
                     {
-                        Index = 3
-                    }
+                        Index = (trip.TimeSpan == null) ? 0 : 6
+                    },
                 });
             }
 
@@ -365,7 +365,15 @@ namespace TravelerBot.Api.Services.Logic
                     new InboundButton
                     {
                         Index = 4
-                    }
+                    },
+                    new InboundButton
+                    {
+                        Index = (trip.DateTime == null) ? 0 : 5
+                    },
+                    new InboundButton
+                    {
+                        Index = (trip.TimeSpan == null) ? 0 : 6
+                    },
                 });
             }
 
@@ -404,6 +412,10 @@ namespace TravelerBot.Api.Services.Logic
                     new InboundButton
                     {
                         Index = 5
+                    },
+                    new InboundButton
+                    {
+                        Index = (trip.TimeSpan == null) ? 0 : 6
                     }
                 });
             }
