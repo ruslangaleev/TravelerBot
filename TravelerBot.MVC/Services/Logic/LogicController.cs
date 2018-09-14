@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TravelerBot.Api.Data.Repositories;
 using TravelerBot.Api.ResourceModels;
+using TravelerBot.MVC.Data.Models;
 using TravelerBot.MVC.Models;
 using TravelerBot.MVC.Services.Logic;
 
@@ -25,8 +27,21 @@ namespace TravelerBot.Api.Services.Logic
                 return s.Get();
             }
 
-            var trips = _tripRepository.Get(accountVkontakteId);
+            var trips = _tripRepository.Get(accountVkontakteId, false);
             var trip = trips.FirstOrDefault();
+
+            if (buttonName == "Редактировать поездки")
+            {
+                trip.TypeTransaction = TypeTransaction.Edit;
+                _tripRepository.Update(trip);
+                return GetKeyboardMenuEdit(accountVkontakteId);
+            }
+            if (trip.TypeTransaction == TypeTransaction.Edit)
+            {
+
+            }
+
+
             if (trip != null)
             {
                 if (trip.TypeTransaction == MVC.Data.Models.TypeTransaction.Search)
@@ -132,7 +147,11 @@ namespace TravelerBot.Api.Services.Logic
 
                 var tripsAsString = trips.Select(t =>
                 {
-                    return $"Кто: {t.AccountId}";
+                    return $"Водитель\r\n" +
+                    $"https://vk.com/id{t.AccountId}\r\n" +
+                    $"{t.FromString} - {t.ToToString}\r\n" +
+                    $"{((DateTime)t.DateTime).ToString("dd.MM.yyyy")}" +
+                    $"{((DateTime)t.DateTime).ToString("hh:mm")}";
                 });
 
                 var message = string.Join("\r\n\r\n", tripsAsString);
@@ -481,6 +500,212 @@ namespace TravelerBot.Api.Services.Logic
             }
 
             return null;
+        }
+
+        private ResponseModel GetKeyboardMenuEdit(int accountVkontakteId)
+        {
+            var trips = _tripRepository.Get(accountVkontakteId, true);
+            if (trips == null || trips.Count() == 0)
+            {
+                return new ResponseModel
+                {
+                    Message = "У вас нет объявлений"
+                };
+            }
+
+            var listButtons = new List<Button[]>();
+            var tripsMessage = new List<string>();
+
+            int step = -1;
+
+            foreach(var entry in trips)
+            {
+                step++;
+                var buttons = new List<Button>
+                {
+                    new Button
+                    {
+                        color = "default",
+                        action = new ResourceModels.Action
+                        {
+                            label = $"Объявление {step}",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
+                            {
+                                button = "1"
+                            })
+                        }
+                    },
+                    new Button
+                    {
+                        color = "negative",
+                        action = new ResourceModels.Action
+                        {
+                            label = "Удалить",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
+                            {
+                                button = "2"
+                            })
+                        }
+                    }
+                };
+
+                listButtons.Add(buttons.ToArray());
+                tripsMessage.Add($"ИД: {step}\r\n" +
+                    $"{entry.FromString} - {entry.ToToString}\r\n" +
+                    $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                    $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
+            }
+
+            listButtons.Add(new List<Button>
+            {
+                new Button
+                {
+                    color = "default",
+                    action = new ResourceModels.Action
+                    {
+                        label = "Перейти на начало",
+                        type = "text",
+                        payload = JsonConvert.SerializeObject(new
+                        {
+                            button = "3"
+                        })
+                    }
+                }
+            }.ToArray());
+
+            var keyboard = new Keyboard
+            {
+                OneTime = false,
+                buttons = listButtons.ToArray()
+            };
+
+            return new ResponseModel
+            {
+                Message =string.Join("\r\n\r\n", tripsMessage),
+                Keyboard = keyboard
+            };
+        }
+
+        private ResponseModel GetKeyboardEdit(string buttonValue, int accountVkontakteId)
+        {
+            // Объявление 1
+            if (buttonValue.Length == 12)
+            {
+                throw new ArgumentNullException();
+            }
+
+            var value = buttonValue.EndsWith(" ");
+
+            var trips = _tripRepository.Get(accountVkontakteId, true).ToArray();
+
+            var buttonsFromTo = new List<Button>
+                {
+                    new Button
+                    {
+                        color = "default",
+                        action = new ResourceModels.Action
+                        {
+                            label = "Откуда",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
+                            {
+                                button = "3"
+                            })
+                        }
+                    },
+                    new Button
+                    {
+                        color = "default",
+                        action = new ResourceModels.Action
+                        {
+                            label = "Куда",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
+                            {
+                                button = "4"
+                            })
+                        }
+                    }
+                }.ToArray();
+
+            var buttonsDateTime = new List<Button>
+                {
+                    new Button
+                    {
+                        color = "default",
+                        action = new ResourceModels.Action
+                        {
+                            label = "Когда",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
+                            {
+                                button = "5"
+                            })
+                        }
+                    },
+                    new Button
+                    {
+                        color = "default",
+                        action = new ResourceModels.Action
+                        {
+                            label = "Во сколько",
+                            type = "text",
+                            payload = JsonConvert.SerializeObject(new
+                            {
+                                button = "6"
+                            })
+                        }
+                    }
+                }.ToArray();
+
+            var startKeyboard = new List<Button>
+                    {
+                        new Button
+                        {
+                            color = "default",
+                            action = new ResourceModels.Action
+                            {
+                                label = "Готово",
+                                type = "text",
+                                payload = JsonConvert.SerializeObject(new
+                                {
+                                    button = "8"
+                                })
+                            }
+                        },
+                        new Button
+                        {
+                            color = "default",
+                            action = new ResourceModels.Action
+                            {
+                                label = "Перейти на начало",
+                                type = "text",
+                                payload = JsonConvert.SerializeObject(new
+                                {
+                                    button = "9"
+                                })
+                            }
+                        }
+                    }.ToArray();
+
+            var keyboard = new Keyboard
+            {
+                OneTime = false,
+                buttons = new[]
+                {
+                    buttonsFromTo,
+                    buttonsDateTime,
+                    startKeyboard
+                }
+            };
+
+            return new ResponseModel
+            {
+                Message = "Редактирование",
+                Keyboard = keyboard
+            };
         }
     }
 }

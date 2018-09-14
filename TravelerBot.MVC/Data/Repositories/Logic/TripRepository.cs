@@ -73,9 +73,9 @@ namespace TravelerBot.MVC.Data.Repositories
             return query.ToList();
         }
 
-        IEnumerable<Trip> ITripRepository.Get(int accountVkontakteId)
+        IEnumerable<Trip> ITripRepository.Get(int accountVkontakteId, bool isPublished)
         {
-            return tripContext.Trips.Where(t => t.AccountId == accountVkontakteId && t.IsPublished == false);
+            return tripContext.Trips.Where(t => t.AccountId == accountVkontakteId && t.IsPublished == isPublished);
         }
     }
 }

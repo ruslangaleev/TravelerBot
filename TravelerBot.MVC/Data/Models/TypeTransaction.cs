@@ -8,6 +8,7 @@ namespace TravelerBot.MVC.Data.Models
     public enum TypeTransaction
     {
         Adding = 0,
-        Search
+        Search,
+        Edit
     }
 }

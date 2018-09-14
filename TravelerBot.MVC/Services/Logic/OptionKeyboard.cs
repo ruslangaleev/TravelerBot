@@ -50,6 +50,19 @@ namespace TravelerBot.MVC.Services.Logic
                             color = "default",
                             action = new Action
                             {
+                                label = "Редактировать поездки",
+                                type = "text",
+                                payload = JsonConvert.SerializeObject(new
+                                {
+                                    button = "4"
+                                })
+                            }
+                        },
+                        new Button
+                        {
+                            color = "default",
+                            action = new Action
+                            {
                                 label = "Перейти на начало",
                                 type = "text",
                                 payload = JsonConvert.SerializeObject(new
