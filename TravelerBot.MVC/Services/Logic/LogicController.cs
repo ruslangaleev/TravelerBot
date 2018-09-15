@@ -89,7 +89,7 @@ namespace TravelerBot.Api.Services.Logic
                 _userRepository.Update(userState);
 
                 var button = new AddMenuButton();
-                return button.GetResponse(new int[0]);
+                return button.GetResponse();
             }
 
             if (buttonName == "Найти поездку")
@@ -316,6 +316,17 @@ namespace TravelerBot.Api.Services.Logic
                             Message = "Укажите комментарии"
                         };
                     }
+
+                    if (buttonName == "Готово")
+                    {
+                        trip = _tripRepository.Get(userState.TripId);
+                        trip.IsPublished = true;
+
+                        _tripRepository.Update(trip);
+
+                        var s = new OptionKeyboard();
+                        return s.Get();
+                    }
                 }
 
                 if (userState.TypeButton == TypeButton.EditFromButton)
@@ -427,7 +438,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Description}";
 
@@ -449,7 +460,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Description}";
 
@@ -471,7 +482,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Description}";
 
