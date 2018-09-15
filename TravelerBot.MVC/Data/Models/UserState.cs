@@ -31,6 +31,7 @@ namespace TravelerBot.MVC.Data.Models
         /// </summary>
         public TypeButton TypeButton { get; set; }
 
+        // TODO: Удалить, не нужны
         /// <summary>
         /// Идентификатор поездки, которая редактируется.
         /// </summary>
@@ -114,7 +115,7 @@ namespace TravelerBot.MVC.Data.Models
                 tripsMessage.Add($"Поездка {step}\r\n\r\n" +
                     $"{entry.FromString} - {entry.ToToString}\r\n" +
                     $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                    $"{((TimeSpan)entry.TimeSpan).ToString(@"hh\:mm")}");
+                    $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
             }
 
             listButtons.Add(new List<Button>

@@ -105,7 +105,7 @@ namespace TravelerBot.MVC.Data.Models
 
             return new ResponseModel
             {
-                Message = "",
+                Message = "123",
                 Keyboard = keyboard
             };
         }

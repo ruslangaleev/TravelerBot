@@ -16,6 +16,15 @@ namespace TravelerBot.MVC.Data.Repositories.Logic
             tripContext.SearchOptions.Add(options);
         }
 
+        public void Delete(Guid optionsId)
+        {
+            var trip = tripContext.SearchOptions.Find(optionsId);
+            if (trip != null)
+            {
+                tripContext.SearchOptions.Remove(trip);
+            }
+        }
+
         public SearchOptions Get(Guid optionId)
         {
             return tripContext.SearchOptions.Find(optionId);
