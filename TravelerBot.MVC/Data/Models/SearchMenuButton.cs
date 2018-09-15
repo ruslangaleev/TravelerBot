@@ -9,14 +9,9 @@ using Action = TravelerBot.Api.ResourceModels.Action;
 
 namespace TravelerBot.MVC.Data.Models
 {
-    public class EditMenuButton : BaseButton
+    public class SearchMenuButton : BaseButton
     {
         public override string Name { get; set; }
-
-        public override ResponseModel GetResponse(IEnumerable<Trip> trips)
-        {
-            throw new NotImplementedException();
-        }
 
         public override ResponseModel GetResponse()
         {
@@ -64,37 +59,24 @@ namespace TravelerBot.MVC.Data.Models
                                 button = "5"
                             })
                         }
-                    },
-                    new Button
-                    {
-                        color = "default",
-                        action = new Action
-                        {
-                            label = "Во сколько",
-                            type = "text",
-                            payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "6"
-                            })
-                        }
                     }
                 }.ToArray();
 
             var startKeyboard = new List<Button>
                     {
-                        //new Button
-                        //{
-                        //    color = "default",
-                        //    action = new Action
-                        //    {
-                        //        label = "Готово",
-                        //        type = "text",
-                        //        payload = JsonConvert.SerializeObject(new
-                        //        {
-                        //            button = "8"
-                        //        })
-                        //    }
-                        //},
+                        new Button
+                        {
+                            color = "default",
+                            action = new Action
+                            {
+                                label = "Искать",
+                                type = "text",
+                                payload = JsonConvert.SerializeObject(new
+                                {
+                                    button = "9"
+                                })
+                            }
+                        },
                         new Button
                         {
                             color = "default",
@@ -123,9 +105,14 @@ namespace TravelerBot.MVC.Data.Models
 
             return new ResponseModel
             {
-                Message = "Редактирование поездки",
+                Message = "",
                 Keyboard = keyboard
             };
+        }
+
+        public override ResponseModel GetResponse(IEnumerable<Trip> trips)
+        {
+            throw new NotImplementedException();
         }
     }
 }

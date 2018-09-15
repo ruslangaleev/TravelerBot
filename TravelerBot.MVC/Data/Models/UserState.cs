@@ -35,6 +35,8 @@ namespace TravelerBot.MVC.Data.Models
         /// Идентификатор поездки, которая редактируется.
         /// </summary>
         public Guid TripId { get; set; }
+
+        public Guid SearchOptionId { get; set; }
     }
 
     public enum TypeButton

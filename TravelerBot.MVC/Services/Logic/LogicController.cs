@@ -17,10 +17,14 @@ namespace TravelerBot.Api.Services.Logic
 
         private readonly IUserRepository _userRepository;
 
-        public LogicController(ITripRepository tripRepository, IUserRepository userRepository)
+        private readonly ISearchRepository _searchRepository;
+
+        public LogicController(ITripRepository tripRepository, IUserRepository userRepository,
+            ISearchRepository searchRepository)
         {
             _tripRepository = tripRepository;
             _userRepository = userRepository;
+            _searchRepository = searchRepository;
         }
 
         public ResponseModel Get(string buttonName, int accountId)
@@ -95,8 +99,22 @@ namespace TravelerBot.Api.Services.Logic
             if (buttonName == "Найти поездку")
             {
                 userState.TypeTransaction = TypeTransaction.Search;
-                //userState.TypeButton = TypeButton.AddMenuButton;
+                var search = _searchRepository.Get(userState.SearchOptionId);
+                if (search == null)
+                {
+                    search = new SearchOptions
+                    {
+                        SearchOptionsId = Guid.NewGuid()
+                    };
+                    _searchRepository.Add(search);
+                    _searchRepository.SaveChanges();
+                }
+
+                userState.TypeButton = TypeButton.AddMenuButton;
                 _userRepository.Update(userState);
+
+                var button = new SearchMenuButton();
+                return button.GetResponse();
             }
 
             // Будет выводит меню для существующей поездки
@@ -488,6 +506,108 @@ namespace TravelerBot.Api.Services.Logic
 
                     return result;
                 }
+            }
+
+            if (userState.TypeTransaction == TypeTransaction.Search)
+            {
+                if (userState.TypeButton == TypeButton.AddMenuButton)
+                {
+                    if (buttonName == "Откуда")
+                    {
+                        userState.TypeButton = TypeButton.EditFromButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditFromButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Куда")
+                    {
+                        userState.TypeButton = TypeButton.EditToButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditFromButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Когда")
+                    {
+                        userState.TypeButton = TypeButton.EditDateButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditDateButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Искать")
+                    {
+                        //trip = _tripRepository.Get(userState.TripId);
+                        //trip.IsPublished = true;
+
+                        //_tripRepository.Update(trip);
+
+                        //var s = new OptionKeyboard();
+                        //return s.Get();
+
+                        trips = _tripRepository.Get(tripOptionDes.FromString, tripOptionDes.ToToString, tripOptionDes.DateTime);
+
+                        if (trips.Count() == 0)
+                        {
+                            return new ResponseModel
+                            {
+                                Message = "Объявлений не найдено"
+                            };
+                        }
+
+                        var tripsAsString = trips.Select(t =>
+                        {
+                            return $"Водитель\r\n" +
+                            $"https://vk.com/id{t.AccountId}\r\n" +
+                            $"{t.FromString} - {t.ToToString}\r\n" +
+                            $"{((DateTime)t.DateTime).ToString("dd.MM.yyyy")}" +
+                            $"{((DateTime)t.DateTime).ToString("hh:mm")}";
+                        });
+
+                        var message = string.Join("\r\n\r\n", tripsAsString);
+
+                        return new ResponseModel
+                        {
+                            Message = message
+                        };
+                    }
+                }
+
+                var searchOption = _searchRepository.Get(userState.SearchOptionId);
+                var tripOption = default(Trip);
+                if (string.IsNullOrEmpty(searchOption.Filter))
+                {
+                    trip = new Trip();
+
+                    searchOption.Filter = JsonConvert.SerializeObject(tripOption);
+                    //_searchRepository.Update(searchOption);
+                    //_searchRepository.SaveChanges();
+                }
+
+                var tripOptionDes = JsonConvert.DeserializeObject<Trip>(searchOption.Filter);
+                if (userState.TypeButton == TypeButton.EditFromButton)
+                {
+                    tripOptionDes.FromString = buttonName;
+                }
+                if (userState.TypeButton == TypeButton.EditToButton)
+                {
+                    tripOptionDes.ToToString = buttonName;
+                }
+                if (userState.TypeButton == TypeButton.EditDateButton)
+                {
+                    tripOptionDes.DateTime = (buttonName == "Сегодня") ? DateTime.Now : DateTime.Now.AddDays(1);
+                }
+
+                searchOption.Filter = JsonConvert.SerializeObject(tripOptionDes);
+                _searchRepository.Update(searchOption);
+                _searchRepository.SaveChanges();
+
+                userState.TypeButton = TypeButton.AddMenuButton;
+                _userRepository.Update(userState);
             }
 
             if (trip != null)

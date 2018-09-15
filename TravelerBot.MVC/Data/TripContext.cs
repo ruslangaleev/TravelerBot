@@ -13,5 +13,7 @@ namespace TravelerBot.MVC.Data
         public DbSet<Trip> Trips { get; set; }
 
         public DbSet<UserState> UserStates { get; set; }
+
+        public DbSet<SearchOptions> SearchOptions { get; set; }
     }
 }
