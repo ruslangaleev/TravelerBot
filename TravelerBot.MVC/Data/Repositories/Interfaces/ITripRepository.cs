@@ -26,6 +26,8 @@ namespace TravelerBot.Api.Data.Repositories
 
         void Delete(Guid tripId);
 
+        void SaveChanges();
+
         IEnumerable<Trip> Get(string from, string to, DateTime? when);
     }
 }

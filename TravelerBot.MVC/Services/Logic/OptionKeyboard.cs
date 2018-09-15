@@ -11,7 +11,7 @@ namespace TravelerBot.MVC.Services.Logic
     {
         public ResponseModel Get()
         {
-            var message = "Добавить или найти поездку?";
+            var message = "Выберите операцию";
 
             var buttons = new List<Button>
                 {
@@ -50,7 +50,7 @@ namespace TravelerBot.MVC.Services.Logic
                             color = "default",
                             action = new Action
                             {
-                                label = "Редактировать поездки",
+                                label = "Мои поездки",
                                 type = "text",
                                 payload = JsonConvert.SerializeObject(new
                                 {

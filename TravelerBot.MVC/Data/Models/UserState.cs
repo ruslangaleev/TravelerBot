@@ -44,7 +44,13 @@ namespace TravelerBot.MVC.Data.Models
         EditFromButton = 2,
         EditToButton = 3,
         EditDateButton = 4,
-        EditTimeButton = 5
+        EditTimeButton = 5,
+
+        AddMenuButton = 6,
+        AddFromButton = 7,
+        AddToButton = 8,
+        AddDateButton = 9,
+        AddTimeButton = 10
     }
 
     public abstract class BaseButton
@@ -104,7 +110,7 @@ namespace TravelerBot.MVC.Data.Models
                 tripsMessage.Add($"Поездка {step}\r\n\r\n" +
                     $"{entry.FromString} - {entry.ToToString}\r\n" +
                     $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                    $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
+                    $"{((TimeSpan)entry.TimeSpan).ToString(@"hh\:mm")}");
             }
 
             listButtons.Add(new List<Button>

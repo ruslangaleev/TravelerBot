@@ -45,7 +45,7 @@ namespace TravelerBot.Api.Services.Logic
             var trip = trips.FirstOrDefault();
 
             // Будет выводить список существующих поездок
-            if (buttonName == "Редактировать поездки")
+            if (buttonName == "Мои поездки")
             {
                 trips = _tripRepository.Get(accountId, true);
                 if (trips == null || trips.Count() == 0)
@@ -65,22 +65,65 @@ namespace TravelerBot.Api.Services.Logic
                 return button.GetResponse(trips);
             }
 
+            if (buttonName == "Добавить поездку")
+            {
+                trips = _tripRepository.Get(accountId, false);
+                foreach(var entry in trips.Select(t => t.TripId))
+                {
+                    _tripRepository.Delete(entry);
+                }
+
+                _tripRepository.SaveChanges();
+
+                userState.TypeTransaction = TypeTransaction.Add;
+                userState.TypeButton = TypeButton.AddMenuButton;
+                _userRepository.Update(userState);
+            }
+
+            if (buttonName == "Найти поездку")
+            {
+                userState.TypeTransaction = TypeTransaction.Search;
+                //userState.TypeButton = TypeButton.AddMenuButton;
+                _userRepository.Update(userState);
+            }
+
             // Будет выводит меню для существующей поездки
             if (userState.TypeTransaction == TypeTransaction.Edit)
             {
                 if (userState.TypeButton == TypeButton.EditButton)
                 {
                     trips = _tripRepository.Get(accountId, true);
-                    trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(9, 1))];
+                    if (buttonName.Length == 10)
+                    {
+                        trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(9, 1))];
 
-                    userState.TripId = trip.TripId;
+                        userState.TripId = trip.TripId;
 
-                    // Выводим список объявлений
-                    userState.TypeButton = TypeButton.EditMenuButton;
-                    _userRepository.Update(userState);
+                        // Выводим список объявлений
+                        userState.TypeButton = TypeButton.EditMenuButton;
+                        _userRepository.Update(userState);
 
-                    var button = new EditMenuButton();
-                    return button.GetResponse();
+                        var button = new EditMenuButton();
+                        return button.GetResponse();
+                    }
+                    if (buttonName.Length == 9)
+                    {
+                        trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(8, 1))];
+                        _tripRepository.Delete(trip.TripId);
+                        _tripRepository.SaveChanges();
+
+                        trips = _tripRepository.Get(accountId, true);
+                        if (trips.Count() == 0)
+                        {
+                            var s = new OptionKeyboard();
+                            var result = s.Get();
+                            result.Message = "У вас нет больше объявлений";
+                            return result;
+                        }
+
+                        var button = new EditButton();
+                        return button.GetResponse(trips);
+                    }
                 }
 
                 if (userState.TypeButton == TypeButton.EditMenuButton)
