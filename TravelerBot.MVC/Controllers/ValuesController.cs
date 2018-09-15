@@ -49,14 +49,19 @@ namespace TravelerBot.MVC.Controllers
                 //string responseMessage = "Привет, я бот. Чем могу помочь?";
 
                 var request = string.Empty;
-                if (responseModel.Keyboard == null)
+                if (responseModel.Keyboard == null && !string.IsNullOrEmpty(responseModel.Message))
                 {
                     request = $"https://api.vk.com/method/messages.send?user_id={message.ObjectMessage.UserId}&group_id={message.GroupId}&message={responseModel.Message}&v=5.80&access_token={_token}";
                 }
-                else
+                if (responseModel.Keyboard != null && string.IsNullOrEmpty(responseModel.Message))
+                {
+                    request = $"https://api.vk.com/method/messages.send?user_id={message.ObjectMessage.UserId}&group_id={message.GroupId}&keyboard={JsonConvert.SerializeObject(responseModel.Keyboard)}&v=5.80&access_token={_token}";
+                }
+                if (responseModel.Keyboard != null && !string.IsNullOrEmpty(responseModel.Message))
                 {
                     request = $"https://api.vk.com/method/messages.send?user_id={message.ObjectMessage.UserId}&group_id={message.GroupId}&message={responseModel.Message}&keyboard={JsonConvert.SerializeObject(responseModel.Keyboard)}&v=5.80&access_token={_token}";
                 }
+
 
                 await _httpClient.GetAsync(request);
 

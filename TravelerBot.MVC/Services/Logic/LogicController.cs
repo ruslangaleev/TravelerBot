@@ -71,7 +71,7 @@ namespace TravelerBot.Api.Services.Logic
                 if (userState.TypeButton == TypeButton.EditButton)
                 {
                     trips = _tripRepository.Get(accountId, true);
-                    trip = trips.ToArray()[Convert.ToInt32(buttonName)];
+                    trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(9, 1))];
 
                     userState.TripId = trip.TripId;
 

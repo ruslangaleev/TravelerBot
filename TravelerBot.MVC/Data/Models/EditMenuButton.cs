@@ -124,7 +124,7 @@ namespace TravelerBot.MVC.Data.Models
 
             return new ResponseModel
             {
-                Message = "Редактирование",
+                Message = "Редактирование поездки",
                 Keyboard = keyboard
             };
         }

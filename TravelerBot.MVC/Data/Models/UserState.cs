@@ -77,7 +77,7 @@ namespace TravelerBot.MVC.Data.Models
                         color = "positive",
                         action = new Action
                         {
-                            label = $"{step}",
+                            label = $"Изменить {step}",
                             type = "text",
                             payload = JsonConvert.SerializeObject(new
                             {
@@ -90,7 +90,7 @@ namespace TravelerBot.MVC.Data.Models
                         color = "negative",
                         action = new Action
                         {
-                            label = $"{step}",
+                            label = $"Удалить {step}",
                             type = "text",
                             payload = JsonConvert.SerializeObject(new
                             {
@@ -101,7 +101,7 @@ namespace TravelerBot.MVC.Data.Models
                 };
 
                 listButtons.Add(buttons.ToArray());
-                tripsMessage.Add($"ИД: {step}\r\n" +
+                tripsMessage.Add($"Поездка {step}\r\n\r\n" +
                     $"{entry.FromString} - {entry.ToToString}\r\n" +
                     $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
                     $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
