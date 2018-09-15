@@ -15,7 +15,12 @@ namespace TravelerBot.Api.Data.Repositories
 
         //Trip Get(int accountVkontakteId);
 
+        Trip GetTrip(int accountId, bool isPublished);
+
+        // Устаревшая
         IEnumerable<Trip> Get(int accountVkontakteId, bool isPublished);
+
+        Trip Get(Guid tripId);
 
         Trip Get();
 

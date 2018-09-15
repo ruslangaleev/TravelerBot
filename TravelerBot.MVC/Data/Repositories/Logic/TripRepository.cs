@@ -37,8 +37,7 @@ namespace TravelerBot.MVC.Data.Repositories
 
         public Trip Get(int accountVkontakteId)
         {
-
-            return tripContext.Trips.FirstOrDefault(t => t.AccountId == accountVkontakteId && t.IsPublished == false);
+            return tripContext.Trips.FirstOrDefault(t => t.AccountId == accountVkontakteId);
         }
 
         public Trip Get()
@@ -76,6 +75,16 @@ namespace TravelerBot.MVC.Data.Repositories
         IEnumerable<Trip> ITripRepository.Get(int accountVkontakteId, bool isPublished)
         {
             return tripContext.Trips.Where(t => t.AccountId == accountVkontakteId && t.IsPublished == isPublished);
+        }
+
+        public Trip GetTrip(int accountId, bool isPublished)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Trip Get(Guid tripId)
+        {
+            return tripContext.Trips.Find(tripId);
         }
     }
 }

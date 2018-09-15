@@ -5,6 +5,7 @@ using System.Linq;
 using TravelerBot.Api.Data.Repositories;
 using TravelerBot.Api.ResourceModels;
 using TravelerBot.MVC.Data.Models;
+using TravelerBot.MVC.Data.Repositories.Interfaces;
 using TravelerBot.MVC.Models;
 using TravelerBot.MVC.Services.Logic;
 
@@ -14,33 +15,190 @@ namespace TravelerBot.Api.Services.Logic
     {
         private readonly ITripRepository _tripRepository;
 
-        public LogicController(ITripRepository tripRepository)
+        private readonly IUserRepository _userRepository;
+
+        public LogicController(ITripRepository tripRepository, IUserRepository userRepository)
         {
             _tripRepository = tripRepository;
+            _userRepository = userRepository;
         }
 
-        public ResponseModel Get(string buttonName, int accountVkontakteId)
+        public ResponseModel Get(string buttonName, int accountId)
         {
+            var userState = _userRepository.GetUserState(accountId);
+            if (userState == null)
+            {
+                _userRepository.AddUserState(new UserState
+                {
+                    AccountId = accountId
+                });
+            }
+
             if (buttonName == "Начать" || buttonName == "Перейти на начало")
             {
                 var s = new OptionKeyboard();
                 return s.Get();
             }
 
-            var trips = _tripRepository.Get(accountVkontakteId, false);
+            // TODO: Чтобы возвращаело только один
+            var trips = _tripRepository.Get(accountId, false);
             var trip = trips.FirstOrDefault();
 
+            // Будет выводить список существующих поездок
             if (buttonName == "Редактировать поездки")
             {
-                trip.TypeTransaction = TypeTransaction.Edit;
-                _tripRepository.Update(trip);
-                return GetKeyboardMenuEdit(accountVkontakteId);
+                trips = _tripRepository.Get(accountId, true);
+                if (trips == null || trips.Count() == 0)
+                {
+                    return new ResponseModel
+                    {
+                        Message = "У вас нет объявлений"
+                    };
+                }
+
+                // Включаем режим редактирования.
+                userState.TypeTransaction = TypeTransaction.Edit;
+                userState.TypeButton = TypeButton.EditButton;
+                _userRepository.Update(userState);
+
+                var button = new EditButton();
+                return button.GetResponse(trips);
             }
-            if (trip.TypeTransaction == TypeTransaction.Edit)
+
+            // Будет выводит меню для существующей поездки
+            if (userState.TypeTransaction == TypeTransaction.Edit)
             {
+                if (userState.TypeButton == TypeButton.EditButton)
+                {
+                    trips = _tripRepository.Get(accountId, true);
+                    trip = trips.ToArray()[Convert.ToInt32(buttonName)];
 
+                    userState.TripId = trip.TripId;
+
+                    // Выводим список объявлений
+                    userState.TypeButton = TypeButton.EditMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new EditMenuButton();
+                    return button.GetResponse();
+                }
+
+                if (userState.TypeButton == TypeButton.EditMenuButton)
+                {
+                    if (buttonName == "Откуда")
+                    {
+                        userState.TypeButton = TypeButton.EditFromButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditFromButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Куда")
+                    {
+                        userState.TypeButton = TypeButton.EditToButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditFromButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Когда")
+                    {
+                        userState.TypeButton = TypeButton.EditDateButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditDateButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Во сколько")
+                    {
+                        userState.TypeButton = TypeButton.EditTimeButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditTimeButton();
+                        return button.GetResponse();
+                    }
+                }
+
+                if (userState.TypeButton == TypeButton.EditFromButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    trip.FromString = buttonName;
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.EditMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new EditMenuButton();
+                    var result = button.GetResponse();
+                    result.Message = 
+                        $"{trip.FromString} - {trip.ToToString}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditToButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    trip.ToToString = buttonName;
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.EditMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new EditMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        $"{trip.FromString} - {trip.ToToString}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditDateButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    
+                    trip.DateTime = new EditDateButton().Convert(buttonName);
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.EditMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new EditMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        $"{trip.FromString} - {trip.ToToString}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditTimeButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    trip.DateTime = new EditTimeButton().Convert((DateTime)trip.DateTime, buttonName);
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.EditMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new EditMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        $"{trip.FromString} - {trip.ToToString}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+
+                    return result;
+                }
             }
-
 
             if (trip != null)
             {
@@ -49,16 +207,16 @@ namespace TravelerBot.Api.Services.Logic
                     if (buttonName == "Добавить поездку")
                     {
                         _tripRepository.Delete(trip.TripId);
-                        return AddTrip(buttonName, accountVkontakteId);
+                        return AddTrip(buttonName, accountId);
                     }
 
                     if (buttonName == "Найти поездку")
                     {
                         _tripRepository.Delete(trip.TripId);
-                        return SearchTrips(buttonName, accountVkontakteId);
+                        return SearchTrips(buttonName, accountId);
                     }
 
-                    return SearchTrips(buttonName, accountVkontakteId, trip);
+                    return SearchTrips(buttonName, accountId, trip);
                 }
                 else
                 {
@@ -67,18 +225,18 @@ namespace TravelerBot.Api.Services.Logic
                         _tripRepository.Delete(trip.TripId);
                     }
 
-                    return AddTrip(buttonName, accountVkontakteId, trip);
+                    return AddTrip(buttonName, accountId, trip);
                 }
             }
             else
             {
                 if (buttonName == "Добавить поездку")
                 {
-                    return AddTrip(buttonName, accountVkontakteId);
+                    return AddTrip(buttonName, accountId);
                 }
                 if (buttonName == "Найти поездку")
                 {
-                    return SearchTrips(buttonName, accountVkontakteId);
+                    return SearchTrips(buttonName, accountId);
                 }
             }
 
@@ -264,7 +422,7 @@ namespace TravelerBot.Api.Services.Logic
                     TripId = Guid.NewGuid(),
                     TypeParticipant = TypeParticipant.Driver,
                     AccountId = accountVkontakteId,
-                    TypeTransaction = MVC.Data.Models.TypeTransaction.Adding
+                    TypeTransaction = MVC.Data.Models.TypeTransaction.Add
                 });
 
                 var s = new MenuKeyboard();
@@ -502,210 +660,95 @@ namespace TravelerBot.Api.Services.Logic
             return null;
         }
 
-        private ResponseModel GetKeyboardMenuEdit(int accountVkontakteId)
-        {
-            var trips = _tripRepository.Get(accountVkontakteId, true);
-            if (trips == null || trips.Count() == 0)
-            {
-                return new ResponseModel
-                {
-                    Message = "У вас нет объявлений"
-                };
-            }
+        //private ResponseModel GetKeyboardMenuEdit(int accountVkontakteId)
+        //{
+        //    var trips = _tripRepository.Get(accountVkontakteId, true);
+        //    if (trips == null || trips.Count() == 0)
+        //    {
+        //        return new ResponseModel
+        //        {
+        //            Message = "У вас нет объявлений"
+        //        };
+        //    }
 
-            var listButtons = new List<Button[]>();
-            var tripsMessage = new List<string>();
+        //    var listButtons = new List<Button[]>();
+        //    var tripsMessage = new List<string>();
 
-            int step = -1;
+        //    int step = -1;
 
-            foreach(var entry in trips)
-            {
-                step++;
-                var buttons = new List<Button>
-                {
-                    new Button
-                    {
-                        color = "default",
-                        action = new ResourceModels.Action
-                        {
-                            label = $"Объявление {step}",
-                            type = "text",
-                            payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "1"
-                            })
-                        }
-                    },
-                    new Button
-                    {
-                        color = "negative",
-                        action = new ResourceModels.Action
-                        {
-                            label = "Удалить",
-                            type = "text",
-                            payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "2"
-                            })
-                        }
-                    }
-                };
+        //    foreach(var entry in trips)
+        //    {
+        //        step++;
+        //        var buttons = new List<Button>
+        //        {
+        //            new Button
+        //            {
+        //                color = "default",
+        //                action = new ResourceModels.Action
+        //                {
+        //                    label = $"Объявление {step}",
+        //                    type = "text",
+        //                    payload = JsonConvert.SerializeObject(new
+        //                    {
+        //                        button = "1"
+        //                    })
+        //                }
+        //            },
+        //            new Button
+        //            {
+        //                color = "negative",
+        //                action = new ResourceModels.Action
+        //                {
+        //                    label = "Удалить",
+        //                    type = "text",
+        //                    payload = JsonConvert.SerializeObject(new
+        //                    {
+        //                        button = "2"
+        //                    })
+        //                }
+        //            }
+        //        };
 
-                listButtons.Add(buttons.ToArray());
-                tripsMessage.Add($"ИД: {step}\r\n" +
-                    $"{entry.FromString} - {entry.ToToString}\r\n" +
-                    $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                    $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
-            }
+        //        listButtons.Add(buttons.ToArray());
+        //        tripsMessage.Add($"ИД: {step}\r\n" +
+        //            $"{entry.FromString} - {entry.ToToString}\r\n" +
+        //            $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+        //            $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
+        //    }
 
-            listButtons.Add(new List<Button>
-            {
-                new Button
-                {
-                    color = "default",
-                    action = new ResourceModels.Action
-                    {
-                        label = "Перейти на начало",
-                        type = "text",
-                        payload = JsonConvert.SerializeObject(new
-                        {
-                            button = "3"
-                        })
-                    }
-                }
-            }.ToArray());
+        //    listButtons.Add(new List<Button>
+        //    {
+        //        new Button
+        //        {
+        //            color = "default",
+        //            action = new ResourceModels.Action
+        //            {
+        //                label = "Перейти на начало",
+        //                type = "text",
+        //                payload = JsonConvert.SerializeObject(new
+        //                {
+        //                    button = "3"
+        //                })
+        //            }
+        //        }
+        //    }.ToArray());
 
-            var keyboard = new Keyboard
-            {
-                OneTime = false,
-                buttons = listButtons.ToArray()
-            };
+        //    var keyboard = new Keyboard
+        //    {
+        //        OneTime = false,
+        //        buttons = listButtons.ToArray()
+        //    };
 
-            return new ResponseModel
-            {
-                Message =string.Join("\r\n\r\n", tripsMessage),
-                Keyboard = keyboard
-            };
-        }
+        //    return new ResponseModel
+        //    {
+        //        Message =string.Join("\r\n\r\n", tripsMessage),
+        //        Keyboard = keyboard
+        //    };
+        //}
 
-        private ResponseModel GetKeyboardEdit(string buttonValue, int accountVkontakteId)
-        {
-            // Объявление 1
-            if (buttonValue.Length == 12)
-            {
-                throw new ArgumentNullException();
-            }
+        //private ResponseModel GetKeyboardEdit(string buttonValue, int accountVkontakteId)
+        //{
 
-            var value = buttonValue.EndsWith(" ");
-
-            var trips = _tripRepository.Get(accountVkontakteId, true).ToArray();
-
-            var buttonsFromTo = new List<Button>
-                {
-                    new Button
-                    {
-                        color = "default",
-                        action = new ResourceModels.Action
-                        {
-                            label = "Откуда",
-                            type = "text",
-                            payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "3"
-                            })
-                        }
-                    },
-                    new Button
-                    {
-                        color = "default",
-                        action = new ResourceModels.Action
-                        {
-                            label = "Куда",
-                            type = "text",
-                            payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "4"
-                            })
-                        }
-                    }
-                }.ToArray();
-
-            var buttonsDateTime = new List<Button>
-                {
-                    new Button
-                    {
-                        color = "default",
-                        action = new ResourceModels.Action
-                        {
-                            label = "Когда",
-                            type = "text",
-                            payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "5"
-                            })
-                        }
-                    },
-                    new Button
-                    {
-                        color = "default",
-                        action = new ResourceModels.Action
-                        {
-                            label = "Во сколько",
-                            type = "text",
-                            payload = JsonConvert.SerializeObject(new
-                            {
-                                button = "6"
-                            })
-                        }
-                    }
-                }.ToArray();
-
-            var startKeyboard = new List<Button>
-                    {
-                        new Button
-                        {
-                            color = "default",
-                            action = new ResourceModels.Action
-                            {
-                                label = "Готово",
-                                type = "text",
-                                payload = JsonConvert.SerializeObject(new
-                                {
-                                    button = "8"
-                                })
-                            }
-                        },
-                        new Button
-                        {
-                            color = "default",
-                            action = new ResourceModels.Action
-                            {
-                                label = "Перейти на начало",
-                                type = "text",
-                                payload = JsonConvert.SerializeObject(new
-                                {
-                                    button = "9"
-                                })
-                            }
-                        }
-                    }.ToArray();
-
-            var keyboard = new Keyboard
-            {
-                OneTime = false,
-                buttons = new[]
-                {
-                    buttonsFromTo,
-                    buttonsDateTime,
-                    startKeyboard
-                }
-            };
-
-            return new ResponseModel
-            {
-                Message = "Редактирование",
-                Keyboard = keyboard
-            };
-        }
+        //}
     }
 }

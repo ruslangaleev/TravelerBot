@@ -38,6 +38,14 @@ namespace TravelerBot.MVC.Models
         /// </summary>
         public bool IsPublished { get; set; }
 
+        /// <summary>
+        /// Какое действие сейчас выполняется?
+        /// </summary>
         public TypeTransaction TypeTransaction { get; set; }
+
+        /// <summary>
+        /// Характерно для редактирования. Указываем какое объявление редактируется.
+        /// </summary>
+        public Guid EditTripId { get; set; }
     }
 }

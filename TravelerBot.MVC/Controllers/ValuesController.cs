@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using TravelerBot.Api.Services.Logic;
 using TravelerBot.MVC.Data.Repositories;
+using TravelerBot.MVC.Data.Repositories.Logic;
 using TravelerBot.MVC.ResourceModels;
 
 namespace TravelerBot.MVC.Controllers
@@ -39,7 +40,9 @@ namespace TravelerBot.MVC.Controllers
             if (message.Type == "message_new")
             {
                 var tripRepository = new TripRepository();
-                var logicController = new LogicController(tripRepository);
+                var userRepository = new UserRepository();
+
+                var logicController = new LogicController(tripRepository, userRepository);
 
                 var responseModel = logicController.Get(message.ObjectMessage.Body, message.ObjectMessage.UserId);
 
