@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 using TravelerBot.MVC.Data.Models;
@@ -8,6 +10,8 @@ namespace TravelerBot.MVC.Models
 {
     public class Trip
     {
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //[Key]
         public Guid TripId { get; set; }
 
         /// <summary>
@@ -47,5 +51,9 @@ namespace TravelerBot.MVC.Models
         /// Характерно для редактирования. Указываем какое объявление редактируется.
         /// </summary>
         public Guid EditTripId { get; set; }
+
+        public string Phone { get; set; }
+
+        public string Description { get; set; }
     }
 }

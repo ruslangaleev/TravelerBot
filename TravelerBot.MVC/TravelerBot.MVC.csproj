@@ -191,6 +191,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Data\Models\AddMenuButton.cs" />
     <Compile Include="Data\Models\EditDateButton.cs" />
     <Compile Include="Data\Models\EditFromButton.cs" />
     <Compile Include="Data\Models\EditMenuButton.cs" />
@@ -222,6 +223,22 @@
     <Compile Include="Migrations\201809150529554_AddUser.cs" />
     <Compile Include="Migrations\201809150529554_AddUser.Designer.cs">
       <DependentUpon>201809150529554_AddUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809151409205_AddNewFieldTrip.cs" />
+    <Compile Include="Migrations\201809151409205_AddNewFieldTrip.Designer.cs">
+      <DependentUpon>201809151409205_AddNewFieldTrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809151618556_UpdateKeyTrip.cs" />
+    <Compile Include="Migrations\201809151618556_UpdateKeyTrip.Designer.cs">
+      <DependentUpon>201809151618556_UpdateKeyTrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809151622593_Update1.cs" />
+    <Compile Include="Migrations\201809151622593_Update1.Designer.cs">
+      <DependentUpon>201809151622593_Update1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809151626511_Update2.cs" />
+    <Compile Include="Migrations\201809151626511_Update2.Designer.cs">
+      <DependentUpon>201809151626511_Update2.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -291,6 +308,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809150529554_AddUser.resx">
       <DependentUpon>201809150529554_AddUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809151409205_AddNewFieldTrip.resx">
+      <DependentUpon>201809151409205_AddNewFieldTrip.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809151618556_UpdateKeyTrip.resx">
+      <DependentUpon>201809151618556_UpdateKeyTrip.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809151622593_Update1.resx">
+      <DependentUpon>201809151622593_Update1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809151626511_Update2.resx">
+      <DependentUpon>201809151626511_Update2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

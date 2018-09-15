@@ -45,12 +45,14 @@ namespace TravelerBot.MVC.Data.Models
         EditToButton = 3,
         EditDateButton = 4,
         EditTimeButton = 5,
+        EditPhoneButton = 7,
+        EditDescriptionButton = 8,
 
         AddMenuButton = 6,
-        AddFromButton = 7,
-        AddToButton = 8,
-        AddDateButton = 9,
-        AddTimeButton = 10
+        //AddFromButton = 7,
+        //AddToButton = 8,
+        //AddDateButton = 9,
+        //AddTimeButton = 10
     }
 
     public abstract class BaseButton

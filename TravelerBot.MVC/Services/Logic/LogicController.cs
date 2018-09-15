@@ -73,11 +73,23 @@ namespace TravelerBot.Api.Services.Logic
                     _tripRepository.Delete(entry);
                 }
 
+                trip = new Trip
+                {
+                    TripId = Guid.NewGuid(),
+                    TypeParticipant = TypeParticipant.Driver
+                };
+
+                _tripRepository.Add(trip);
+
                 _tripRepository.SaveChanges();
 
                 userState.TypeTransaction = TypeTransaction.Add;
                 userState.TypeButton = TypeButton.AddMenuButton;
+                userState.TripId = trip.TripId;
                 _userRepository.Update(userState);
+
+                var button = new AddMenuButton();
+                return button.GetResponse(new int[0]);
             }
 
             if (buttonName == "Найти поездку")
@@ -238,6 +250,230 @@ namespace TravelerBot.Api.Services.Logic
                         $"{trip.FromString} - {trip.ToToString}\r\n" +
                         $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
                         $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+
+                    return result;
+                }
+            }
+
+            if (userState.TypeTransaction == TypeTransaction.Add)
+            {
+                if (userState.TypeButton == TypeButton.AddMenuButton)
+                {
+                    if (buttonName == "Откуда")
+                    {
+                        userState.TypeButton = TypeButton.EditFromButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditFromButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Куда")
+                    {
+                        userState.TypeButton = TypeButton.EditToButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditFromButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Когда")
+                    {
+                        userState.TypeButton = TypeButton.EditDateButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditDateButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Во сколько")
+                    {
+                        userState.TypeButton = TypeButton.EditTimeButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditTimeButton();
+                        return button.GetResponse();
+                    }
+
+                    if (buttonName == "Телефон")
+                    {
+                        userState.TypeButton = TypeButton.EditPhoneButton;
+                        _userRepository.Update(userState);
+
+                        return new ResponseModel
+                        {
+                            Message = "Укажите номер"
+                        };
+                    }
+
+                    if (buttonName == "Комментарии")
+                    {
+                        userState.TypeButton = TypeButton.EditDescriptionButton;
+                        _userRepository.Update(userState);
+
+                        return new ResponseModel
+                        {
+                            Message = "Укажите комментарии"
+                        };
+                    }
+                }
+
+                if (userState.TypeButton == TypeButton.EditFromButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    trip.FromString = buttonName;
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.AddMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new AddMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
+                        "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
+                        "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Телефон : " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
+                        $"Комментарии {trip.Description}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditToButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    trip.ToToString = buttonName;
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.AddMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new AddMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
+                        "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
+                        "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
+                        $"Комментарии {trip.Description}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditTimeButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    var time = TimeSpan.Parse(buttonName);
+                    if (trip.DateTime == null)
+                    {
+                        trip.DateTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, time.Hours, time.Minutes, 0);
+                    }
+                    else
+                    {
+                        trip.DateTime = new DateTime(((DateTime)trip.DateTime).Year, ((DateTime)trip.DateTime).Month, ((DateTime)trip.DateTime).Day, time.Hours, time.Minutes, 0);
+                    }
+                    
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.AddMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new AddMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
+                        "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
+                        "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
+                        $"Комментарии {trip.Description}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditDateButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    var now = default(DateTime);
+                    if (buttonName == "Сегодня")
+                    {
+                        now = DateTime.UtcNow;
+                    }
+                    if (buttonName == "Завтра")
+                    {
+                        now = DateTime.UtcNow.AddDays(1);
+                    }
+
+                    if (trip.DateTime == null)
+                    {
+                        trip.DateTime = now;
+                    }
+                    else
+                    {
+                        var time = (DateTime)trip.DateTime;
+                        trip.DateTime = new DateTime(now.Year, now.Month, now.Day, time.Hour, time.Minute, 0);
+                    }
+
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.AddMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new AddMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
+                        "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
+                        "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
+                        $"Комментарии {trip.Description}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditPhoneButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    trip.Phone = buttonName;
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.AddMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new AddMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
+                        "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
+                        "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
+                        $"Комментарии {trip.Description}";
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditPhoneButton)
+                {
+                    trip = _tripRepository.Get(userState.TripId);
+                    trip.Description = buttonName;
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.AddMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new AddMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        "Откуда: " + (string.IsNullOrEmpty(trip.FromString) ? "?" : trip.FromString) + "\r\n" +
+                        "Куда: " + (string.IsNullOrEmpty(trip.ToToString) ? "?" : trip.ToToString) + "\r\n" +
+                        "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
+                        "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
+                        $"Комментарии {trip.Description}";
 
                     return result;
                 }
