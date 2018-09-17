@@ -13,11 +13,10 @@ namespace TravelerBot.MVC.Data.Models
 {
     public class UserState
     {
-        [Key]
         public Guid UserStateId { get; set; }
 
         /// <summary>
-        /// Идентификатор пользователя в Вконтакте.
+        /// Идентификатор внешнего аккаунта.
         /// </summary>
         public int AccountId { get; set; }
 
@@ -31,13 +30,12 @@ namespace TravelerBot.MVC.Data.Models
         /// </summary>
         public TypeButton TypeButton { get; set; }
 
-        // TODO: Удалить, не нужны
         /// <summary>
-        /// Идентификатор поездки, которая редактируется.
+        /// Характерна для поиска.
         /// </summary>
-        public Guid TripId { get; set; }
+        public string Filter { get; set; }
 
-        public Guid SearchOptionId { get; set; }
+        public Guid TripId { get; set; }
     }
 
     public enum TypeButton
@@ -52,10 +50,6 @@ namespace TravelerBot.MVC.Data.Models
         EditDescriptionButton = 8,
 
         AddMenuButton = 6,
-        //AddFromButton = 7,
-        //AddToButton = 8,
-        //AddDateButton = 9,
-        //AddTimeButton = 10
     }
 
     public abstract class BaseButton
@@ -113,7 +107,7 @@ namespace TravelerBot.MVC.Data.Models
 
                 listButtons.Add(buttons.ToArray());
                 tripsMessage.Add($"Поездка {step}\r\n\r\n" +
-                    $"{entry.FromString} - {entry.ToToString}\r\n" +
+                    $"{entry.Whence} - {entry.Where}\r\n" +
                     $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
                     $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
             }

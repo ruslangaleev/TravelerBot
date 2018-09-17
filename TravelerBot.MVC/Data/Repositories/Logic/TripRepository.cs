@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -34,11 +35,6 @@ namespace TravelerBot.MVC.Data.Repositories
             }
         }
 
-        public Trip Get(int accountVkontakteId)
-        {
-            return tripContext.Trips.FirstOrDefault(t => t.AccountId == accountVkontakteId);
-        }
-
         public Trip Get()
         {
             return tripContext.Trips.FirstOrDefault(t => t.DateTime >= DateTime.Now && t.IsPublished);
@@ -49,11 +45,11 @@ namespace TravelerBot.MVC.Data.Repositories
             IQueryable<Trip> query = tripContext.Trips;
             if (!string.IsNullOrEmpty(from))
             {
-                query = query.Where(t => t.FromString == from);
+                query = query.Where(t => t.Whence == from);
             }
             if (!string.IsNullOrEmpty(to))
             {
-                query = query.Where(t => t.ToToString == to);
+                query = query.Where(t => t.Where == to);
             }
             if (whenn != null)
             {
@@ -68,17 +64,7 @@ namespace TravelerBot.MVC.Data.Repositories
                 var when = DateTime.Now;
                 query = query.Where(t => t.DateTime >= when);
             }
-            return query.ToList();
-        }
-
-        IEnumerable<Trip> ITripRepository.Get(int accountVkontakteId, bool isPublished)
-        {
-            return tripContext.Trips.Where(t => t.AccountId == accountVkontakteId && t.IsPublished == isPublished);
-        }
-
-        public Trip GetTrip(int accountId, bool isPublished)
-        {
-            throw new NotImplementedException();
+            return query.Include(t => t.UserState).ToList();
         }
 
         public Trip Get(Guid tripId)
@@ -89,6 +75,16 @@ namespace TravelerBot.MVC.Data.Repositories
         public void SaveChanges()
         {
             tripContext.SaveChanges();
+        }
+
+        public Trip GetTripByUserStateId(Guid userStateId)
+        {
+            return tripContext.Trips.FirstOrDefault(t => t.UserStateId == userStateId && t.IsPublished == false);
+        }
+
+        public IEnumerable<Trip> GetTripsByUserStateId(Guid userStateId)
+        {
+            return tripContext.Trips.Where(t => t.UserStateId == userStateId && t.IsPublished == true);
         }
     }
 }

@@ -13,13 +13,6 @@ namespace TravelerBot.Api.Data.Repositories
 
         void Update(Trip trip);
 
-        //Trip Get(int accountVkontakteId);
-
-        Trip GetTrip(int accountId, bool isPublished);
-
-        // Устаревшая
-        IEnumerable<Trip> Get(int accountVkontakteId, bool isPublished);
-
         Trip Get(Guid tripId);
 
         Trip Get();
@@ -29,5 +22,9 @@ namespace TravelerBot.Api.Data.Repositories
         void SaveChanges();
 
         IEnumerable<Trip> Get(string from, string to, DateTime? when);
+
+        Trip GetTripByUserStateId(Guid userStateId);
+
+        IEnumerable<Trip> GetTripsByUserStateId(Guid userStateId);
     }
 }

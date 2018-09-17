@@ -197,13 +197,10 @@
     <Compile Include="Data\Models\EditMenuButton.cs" />
     <Compile Include="Data\Models\EditTimeButton.cs" />
     <Compile Include="Data\Models\SearchMenuButton.cs" />
-    <Compile Include="Data\Models\SearchOptions.cs" />
     <Compile Include="Data\Models\TypeTransaction.cs" />
     <Compile Include="Data\Models\UserState.cs" />
     <Compile Include="Data\Repositories\Interfaces\ITripRepository.cs" />
     <Compile Include="Data\Repositories\Interfaces\IUserRepository.cs" />
-    <Compile Include="Data\Repositories\Interfaces\ISearchRepository.cs" />
-    <Compile Include="Data\Repositories\Logic\SearchRepository.cs" />
     <Compile Include="Data\Repositories\Logic\TripRepository.cs" />
     <Compile Include="Data\Repositories\Logic\UserRepository.cs" />
     <Compile Include="Data\TripContext.cs" />

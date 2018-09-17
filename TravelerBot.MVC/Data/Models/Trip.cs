@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 using TravelerBot.MVC.Data.Models;
 
 namespace TravelerBot.MVC.Models
 {
     public class Trip
     {
-        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        //[Key]
+        /// <summary>
+        /// Идентификатор.
+        /// </summary>
         public Guid TripId { get; set; }
 
         /// <summary>
@@ -19,23 +15,20 @@ namespace TravelerBot.MVC.Models
         /// </summary>
         public TypeParticipant TypeParticipant { get; set; }
 
-        public bool From { get; set; }
+        /// <summary>
+        /// Откуда.
+        /// </summary>
+        public string Whence { get; set; }
 
-        public string FromString { get; set; }
+        /// <summary>
+        /// Куда.
+        /// </summary>
+        public string Where { get; set; }
 
-        public bool To { get; set; }
-
-        public string ToToString { get; set; }
-
-        public bool Date { get; set; }
-
-        public bool Time { get; set; }
-
+        /// <summary>
+        /// Дата и время выезда.
+        /// </summary>
         public DateTime? DateTime { get; set; }
-
-        public TimeSpan? TimeSpan { get; set; }
-
-        public int AccountId { get; set; }
 
         /// <summary>
         /// Опубликовано ли объявление?
@@ -43,17 +36,20 @@ namespace TravelerBot.MVC.Models
         public bool IsPublished { get; set; }
 
         /// <summary>
-        /// Какое действие сейчас выполняется?
+        /// Телефон.
         /// </summary>
-        public TypeTransaction TypeTransaction { get; set; }
-
-        /// <summary>
-        /// Характерно для редактирования. Указываем какое объявление редактируется.
-        /// </summary>
-        public Guid EditTripId { get; set; }
-
         public string Phone { get; set; }
 
-        public string Description { get; set; }
+        /// <summary>
+        /// Комментарии.
+        /// </summary>
+        public string Comments { get; set; }
+
+        /// <summary>
+        /// Идентификатор пользователя.
+        /// </summary>
+        public Guid UserStateId { get; set; }
+
+        public virtual UserState UserState { get; set; }
     }
 }

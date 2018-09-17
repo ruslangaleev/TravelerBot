@@ -41,9 +41,8 @@ namespace TravelerBot.MVC.Controllers
             {
                 var tripRepository = new TripRepository();
                 var userRepository = new UserRepository();
-                var searchRepository = new SearchRepository();
 
-                var logicController = new LogicController(tripRepository, userRepository, searchRepository);
+                var logicController = new LogicController(tripRepository, userRepository);
 
                 var responseModel = logicController.Get(message.ObjectMessage.Body, message.ObjectMessage.UserId);
 
