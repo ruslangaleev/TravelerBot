@@ -13,9 +13,9 @@ namespace TravelerBot.Api.Data.Repositories
 
         void Update(Trip trip);
 
-        Trip Get(Guid tripId);
+        //Trip Get(Guid tripId);
 
-        Trip Get();
+        //Trip Get();
 
         void Delete(Guid tripId);
 

@@ -182,7 +182,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditFromButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Whence = buttonName;
                     _tripRepository.Update(trip);
 
@@ -201,7 +201,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditToButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Where = buttonName;
                     _tripRepository.Update(trip);
 
@@ -220,7 +220,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditDateButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
 
                     trip.DateTime = new EditDateButton().Convert(buttonName);
                     _tripRepository.Update(trip);
@@ -240,7 +240,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditTimeButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.DateTime = new EditTimeButton().Convert((DateTime)trip.DateTime, buttonName);
                     _tripRepository.Update(trip);
 
@@ -322,9 +322,17 @@ namespace TravelerBot.Api.Services.Logic
 
                     if (buttonName == "Готово")
                     {
-                        trip = _tripRepository.Get(userState.TripId);
-                        trip.IsPublished = true;
+                        trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                        if (string.IsNullOrEmpty(trip.Whence) || string.IsNullOrEmpty(trip.Where)
+                            || string.IsNullOrEmpty(trip.Phone) || trip.DateTime == null)
+                        {
+                            return new ResponseModel
+                            {
+                                Message = "Необходимо указать все пункты"
+                            };
+                        }
 
+                        trip.IsPublished = true;
                         _tripRepository.Update(trip);
 
                         var s = new OptionKeyboard();
@@ -378,7 +386,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditTimeButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     var time = TimeSpan.Parse(buttonName);
                     if (trip.DateTime == null)
                     {
@@ -409,7 +417,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditDateButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     var now = default(DateTime);
                     if (buttonName == "Сегодня")
                     {
@@ -450,7 +458,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditPhoneButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Phone = buttonName;
                     _tripRepository.Update(trip);
 
@@ -472,7 +480,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditPhoneButton)
                 {
-                    trip = _tripRepository.Get(userState.TripId);
+                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Comments = buttonName;
                     _tripRepository.Update(trip);
 
