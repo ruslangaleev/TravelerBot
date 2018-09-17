@@ -13,18 +13,17 @@ namespace TravelerBot.Api.Data.Repositories
 
         void Update(Trip trip);
 
-        //Trip Get(Guid tripId);
-
-        //Trip Get();
-
         void Delete(Guid tripId);
 
         void SaveChanges();
 
         IEnumerable<Trip> Get(string from, string to, DateTime? when);
 
-        Trip GetTripByUserStateId(Guid userStateId);
+        // Убрать второй параметр
+        Trip GetTripByUserStateId(Guid userStateId, bool isPublished = false);
 
         IEnumerable<Trip> GetTripsByUserStateId(Guid userStateId);
+
+        Trip GetTrip(Guid TripId);
     }
 }

@@ -13,16 +13,6 @@ namespace TravelerBot.MVC.Data.Models
     {
         public override string Name { get; set; }
 
-        public DateTime Convert(string when)
-        {
-            if (when == "Сегодня")
-            {
-                return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, 0, 0, 0);
-            }
-
-            return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, 0, 0, 0).AddDays(1);
-        }
-
         public override ResponseModel GetResponse()
         {
             var message = "Выберите дату";

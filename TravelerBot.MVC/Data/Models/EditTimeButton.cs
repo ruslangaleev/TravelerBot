@@ -11,13 +11,7 @@ namespace TravelerBot.MVC.Data.Models
 {
     public class EditTimeButton : BaseButton
     {
-        public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public  DateTime Convert(DateTime dateTime, string time)
-        {
-            var timeSpan = TimeSpan.Parse(time);
-            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, timeSpan.Hours, timeSpan.Minutes, 0);
-        }
+        public override string Name { get; set; }
 
         public override ResponseModel GetResponse()
         {

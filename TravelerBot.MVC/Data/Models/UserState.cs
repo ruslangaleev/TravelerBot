@@ -106,10 +106,12 @@ namespace TravelerBot.MVC.Data.Models
                 };
 
                 listButtons.Add(buttons.ToArray());
-                tripsMessage.Add($"Поездка {step}\r\n\r\n" +
+                tripsMessage.Add($"Поездка {step}:\r\n" +
                     $"{entry.Whence} - {entry.Where}\r\n" +
-                    $"{((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                    $"{((DateTime)entry.DateTime).ToString("hh:mm")}");
+                    $"Когда: {((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                    $"Во сколько: {((DateTime)entry.DateTime).ToString("HH:mm")}\r\n" +
+                    $"Телефон: {entry.Phone}\r\n" +
+                    ((string.IsNullOrEmpty(entry.Comments)) ? null : $"Комментарии: {entry.Comments}"));
             }
 
             listButtons.Add(new List<Button>

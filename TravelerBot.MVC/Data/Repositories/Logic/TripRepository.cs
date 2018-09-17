@@ -77,14 +77,19 @@ namespace TravelerBot.MVC.Data.Repositories
             tripContext.SaveChanges();
         }
 
-        public Trip GetTripByUserStateId(Guid userStateId)
+        public Trip GetTripByUserStateId(Guid userStateId, bool isPublished = false)
         {
-            return tripContext.Trips.FirstOrDefault(t => t.UserStateId == userStateId && t.IsPublished == false);
+            return tripContext.Trips.FirstOrDefault(t => t.UserStateId == userStateId && t.IsPublished == isPublished);
         }
 
         public IEnumerable<Trip> GetTripsByUserStateId(Guid userStateId)
         {
             return tripContext.Trips.Where(t => t.UserStateId == userStateId && t.IsPublished == true);
+        }
+
+        public Trip GetTrip(Guid tripId)
+        {
+            return tripContext.Trips.Find(tripId);
         }
     }
 }

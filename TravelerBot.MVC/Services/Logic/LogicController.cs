@@ -41,7 +41,7 @@ namespace TravelerBot.Api.Services.Logic
             }
 
             // TODO: Чтобы возвращаело только один
-            var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+            //var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
 
             // Будет выводить список существующих поездок
             if (buttonName == "Мои поездки")
@@ -66,7 +66,7 @@ namespace TravelerBot.Api.Services.Logic
 
             if (buttonName == "Добавить поездку")
             {
-                trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                 if (trip != null)
                 {
                     _tripRepository.Delete(trip.TripId);
@@ -110,7 +110,7 @@ namespace TravelerBot.Api.Services.Logic
                     var trips = _tripRepository.GetTripsByUserStateId(userState.UserStateId);
                     if (buttonName.Length == 10)
                     {
-                        trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(9, 1))];
+                        var trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(9, 1))];
 
                         userState.TripId = trip.TripId;
 
@@ -123,7 +123,7 @@ namespace TravelerBot.Api.Services.Logic
                     }
                     if (buttonName.Length == 9)
                     {
-                        trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(8, 1))];
+                        var trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(8, 1))];
                         _tripRepository.Delete(trip.TripId);
                         _tripRepository.SaveChanges();
 
@@ -182,7 +182,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditFromButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTrip(userState.TripId);
                     trip.Whence = buttonName;
                     _tripRepository.Update(trip);
 
@@ -193,15 +193,17 @@ namespace TravelerBot.Api.Services.Logic
                     var result = button.GetResponse();
                     result.Message =
                         $"{trip.Whence} - {trip.Where}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+                        $"Когда: {((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"Во сколько: {((DateTime)trip.DateTime).ToString("HH:mm")}\r\n" +
+                        $"Телефон: {trip.Phone}\r\n" +
+                        ((string.IsNullOrEmpty(trip.Comments)) ? null : $"Комментарии: {trip.Comments}");
 
                     return result;
                 }
 
                 if (userState.TypeButton == TypeButton.EditToButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTrip(userState.TripId);
                     trip.Where = buttonName;
                     _tripRepository.Update(trip);
 
@@ -212,17 +214,41 @@ namespace TravelerBot.Api.Services.Logic
                     var result = button.GetResponse();
                     result.Message =
                         $"{trip.Whence} - {trip.Where}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+                        $"Когда: {((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"Во сколько: {((DateTime)trip.DateTime).ToString("HH:mm")}\r\n" +
+                        $"Телефон: {trip.Phone}\r\n" +
+                        ((string.IsNullOrEmpty(trip.Comments)) ? null : $"Комментарии: {trip.Comments}");
 
                     return result;
                 }
 
                 if (userState.TypeButton == TypeButton.EditDateButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTrip(userState.TripId);
+                    
+                    if (buttonName == "Сегодня")
+                    {
+                        var now = DateTime.UtcNow.AddHours(5);
+                        var time = (DateTime)trip.DateTime;
+                        trip.DateTime = new DateTime(now.Year, now.Month, now.Day, time.Hour, time.Minute, 0);
+                    }
+                    else
+                    if (buttonName == "Завтра")
+                    {
+                        var now = DateTime.UtcNow.AddHours(5).AddDays(1);
+                        var time = (DateTime)trip.DateTime;
+                        trip.DateTime = new DateTime(now.Year, now.Month, now.Day, time.Hour, time.Minute, 0);
+                    }
+                    else
+                    {
+                        return new ResponseModel
+                        {
+                            Message = "Команда не распознана"
+                        };
+                    }
 
-                    trip.DateTime = new EditDateButton().Convert(buttonName);
+                     new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, 0, 0, 0).AddDays(1);
+
                     _tripRepository.Update(trip);
 
                     userState.TypeButton = TypeButton.EditMenuButton;
@@ -232,16 +258,21 @@ namespace TravelerBot.Api.Services.Logic
                     var result = button.GetResponse();
                     result.Message =
                         $"{trip.Whence} - {trip.Where}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+                        $"Когда: {((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"Во сколько: {((DateTime)trip.DateTime).ToString("HH:mm")}\r\n" +
+                        $"Телефон: {trip.Phone}\r\n" +
+                        ((string.IsNullOrEmpty(trip.Comments)) ? null : $"Комментарии: {trip.Comments}");
 
                     return result;
                 }
 
                 if (userState.TypeButton == TypeButton.EditTimeButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
-                    trip.DateTime = new EditTimeButton().Convert((DateTime)trip.DateTime, buttonName);
+                    var trip = _tripRepository.GetTrip(userState.TripId);
+                    var timeSpan = TimeSpan.Parse(buttonName);
+                    var date = (DateTime)trip.DateTime;
+                    trip.DateTime = new DateTime(date.Year, date.Month, date.Day, timeSpan.Hours, timeSpan.Minutes, 0);
+
                     _tripRepository.Update(trip);
 
                     userState.TypeButton = TypeButton.EditMenuButton;
@@ -251,8 +282,10 @@ namespace TravelerBot.Api.Services.Logic
                     var result = button.GetResponse();
                     result.Message =
                         $"{trip.Whence} - {trip.Where}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
-                        $"{((DateTime)trip.DateTime).ToString("hh:mm")}";
+                        $"Когда: {((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"Во сколько: {((DateTime)trip.DateTime).ToString("HH:mm")}\r\n" +
+                        $"Телефон: {trip.Phone}\r\n" +
+                        ((string.IsNullOrEmpty(trip.Comments)) ? null : $"Комментарии: {trip.Comments}");
 
                     return result;
                 }
@@ -322,7 +355,7 @@ namespace TravelerBot.Api.Services.Logic
 
                     if (buttonName == "Готово")
                     {
-                        trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                        var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                         if (string.IsNullOrEmpty(trip.Whence) || string.IsNullOrEmpty(trip.Where)
                             || string.IsNullOrEmpty(trip.Phone) || trip.DateTime == null)
                         {
@@ -342,7 +375,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditFromButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Whence = buttonName;
                     _tripRepository.Update(trip);
 
@@ -355,7 +388,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.Whence) ? "?" : trip.Whence) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.Where) ? "?" : trip.Where) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("HH:mm")) + "\r\n" +
                         "Телефон : " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Comments}";
 
@@ -364,7 +397,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditToButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.TripId);
+                    var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Where = buttonName;
                     _tripRepository.Update(trip);
 
@@ -377,7 +410,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.Whence) ? "?" : trip.Whence) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.Where) ? "?" : trip.Where) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("HH:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Comments}";
 
@@ -386,11 +419,18 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditTimeButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     var time = TimeSpan.Parse(buttonName);
                     if (trip.DateTime == null)
                     {
-                        trip.DateTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, time.Hours, time.Minutes, 0);
+                        var now = DateTime.UtcNow.AddHours(5);
+                        var date = new DateTime(now.Year, now.Month, now.Day, time.Hours, time.Minutes, 0);
+                        if (now > date)
+                        {
+                            date = date.AddDays(1);
+                        }
+
+                        trip.DateTime = date;
                     }
                     else
                     {
@@ -408,7 +448,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.Whence) ? "?" : trip.Whence) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.Where) ? "?" : trip.Where) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("HH:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Comments}";
 
@@ -417,15 +457,15 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditDateButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     var now = default(DateTime);
                     if (buttonName == "Сегодня")
                     {
-                        now = DateTime.UtcNow;
+                        now = DateTime.UtcNow.AddHours(5);
                     }
                     if (buttonName == "Завтра")
                     {
-                        now = DateTime.UtcNow.AddDays(1);
+                        now = DateTime.UtcNow.AddDays(1).AddHours(5);
                     }
 
                     if (trip.DateTime == null)
@@ -449,7 +489,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.Whence) ? "?" : trip.Whence) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.Where) ? "?" : trip.Where) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("HH:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Comments}";
 
@@ -458,7 +498,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditPhoneButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Phone = buttonName;
                     _tripRepository.Update(trip);
 
@@ -471,7 +511,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.Whence) ? "?" : trip.Whence) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.Where) ? "?" : trip.Where) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("HH:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Comments}";
 
@@ -480,7 +520,7 @@ namespace TravelerBot.Api.Services.Logic
 
                 if (userState.TypeButton == TypeButton.EditPhoneButton)
                 {
-                    trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
+                    var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Comments = buttonName;
                     _tripRepository.Update(trip);
 
@@ -493,7 +533,7 @@ namespace TravelerBot.Api.Services.Logic
                         "Откуда: " + (string.IsNullOrEmpty(trip.Whence) ? "?" : trip.Whence) + "\r\n" +
                         "Куда: " + (string.IsNullOrEmpty(trip.Where) ? "?" : trip.Where) + "\r\n" +
                         "Когда: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("dd.MM.yyyy")) + "\r\n" +
-                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("hh:mm")) + "\r\n" +
+                        "Во сколько: " + (trip.DateTime == null ? "?" : ((DateTime)trip.DateTime).ToString("HH:mm")) + "\r\n" +
                         "Телефон: " + (string.IsNullOrEmpty(trip.Phone) ? "?" : trip.Phone) + "\r\n" +
                         $"Комментарии {trip.Comments}";
 
@@ -553,7 +593,7 @@ namespace TravelerBot.Api.Services.Logic
                             $"https://vk.com/id{t.UserState.AccountId}\r\n" +
                             $"{t.Whence} - {t.Where}\r\n" +
                             $"{((DateTime)t.DateTime).ToString("dd.MM.yyyy")}" +
-                            $"{((DateTime)t.DateTime).ToString("hh:mm")}";
+                            $"{((DateTime)t.DateTime).ToString("HH:mm")}";
                         });
 
                         var message = string.Join("\r\n\r\n", tripsAsString);
@@ -564,11 +604,10 @@ namespace TravelerBot.Api.Services.Logic
                         };
                     }
                 }
-
-                //var searchOption = _searchRepository.Get(userState.SearchOptionId);
+                
                 if (string.IsNullOrEmpty(userState.Filter))
                 {
-                    trip = new Trip();
+                    var trip = new Trip();
 
                     userState.Filter = JsonConvert.SerializeObject(trip);
                 }
@@ -597,7 +636,10 @@ namespace TravelerBot.Api.Services.Logic
                 return newbutton.GetResponse();
             }
 
-            return null;
+            return new ResponseModel
+            {
+                Message = "Команда не распознана"
+            };
         }
     }
 }
