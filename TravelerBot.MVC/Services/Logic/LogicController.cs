@@ -39,11 +39,7 @@ namespace TravelerBot.Api.Services.Logic
                 var s = new OptionKeyboard();
                 return s.Get();
             }
-
-            // TODO: Чтобы возвращаело только один
-            //var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
-
-            // Будет выводить список существующих поездок
+            
             if (buttonName == "Мои поездки")
             {
                 var trips = _tripRepository.GetTripsByUserStateId(userState.UserStateId);
@@ -70,6 +66,18 @@ namespace TravelerBot.Api.Services.Logic
                 if (trip != null)
                 {
                     _tripRepository.Delete(trip.TripId);
+                }
+
+                var trips = _tripRepository
+                    .GetTripsByUserStateId(userState.UserStateId)
+                    .Where(t => t.DateTime >= DateTime.Now);
+
+                if (trips.Count() > 2)
+                {
+                    return new ResponseModel
+                    {
+                        Message = "Пока нельзя публиковать более 2 поездок. Сори=("
+                    };
                 }
 
                 trip = new Trip
@@ -101,8 +109,7 @@ namespace TravelerBot.Api.Services.Logic
                 var button = new SearchMenuButton();
                 return button.GetResponse();
             }
-
-            // Будет выводит меню для существующей поездки
+            
             if (userState.TypeTransaction == TypeTransaction.Edit)
             {
                 if (userState.TypeButton == TypeButton.EditButton)
@@ -110,7 +117,16 @@ namespace TravelerBot.Api.Services.Logic
                     var trips = _tripRepository.GetTripsByUserStateId(userState.UserStateId);
                     if (buttonName.Length == 10)
                     {
-                        var trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(9, 1))];
+                        var value = buttonName.Substring(9, 1);
+                        int number = 0;
+                        if (!int.TryParse(value, out number))
+                        {
+                            return new ResponseModel
+                            {
+                                Message = "Команда не распознана"
+                            };
+                        }
+                        var trip = trips.ToArray()[number - 1];
 
                         userState.TripId = trip.TripId;
 
@@ -123,7 +139,17 @@ namespace TravelerBot.Api.Services.Logic
                     }
                     if (buttonName.Length == 9)
                     {
-                        var trip = trips.ToArray()[Convert.ToInt32(buttonName.Substring(8, 1))];
+                        var value = buttonName.Substring(8, 1);
+                        int number = 0;
+                        if (!int.TryParse(value, out number))
+                        {
+                            return new ResponseModel
+                            {
+                                Message = "Команда не распознана"
+                            };
+                        }
+                        var trip = trips.ToArray()[number - 1];
+
                         _tripRepository.Delete(trip.TripId);
                         _tripRepository.SaveChanges();
 
@@ -177,6 +203,26 @@ namespace TravelerBot.Api.Services.Logic
 
                         var button = new EditTimeButton();
                         return button.GetResponse();
+                    }
+
+                    if (buttonName == "Телефон")
+                    {
+                        userState.TypeButton = TypeButton.EditPhoneButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditTimeButton();
+                        var result = button.GetResponse();
+                        result.Message = "Укажите номер телефона";
+                    }
+
+                    if (buttonName == "Комментарии")
+                    {
+                        userState.TypeButton = TypeButton.EditDescriptionButton;
+                        _userRepository.Update(userState);
+
+                        var button = new EditTimeButton();
+                        var result = button.GetResponse();
+                        result.Message = "Укажите комментарии";
                     }
                 }
 
@@ -272,6 +318,50 @@ namespace TravelerBot.Api.Services.Logic
                     var timeSpan = TimeSpan.Parse(buttonName);
                     var date = (DateTime)trip.DateTime;
                     trip.DateTime = new DateTime(date.Year, date.Month, date.Day, timeSpan.Hours, timeSpan.Minutes, 0);
+
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.EditMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new EditMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        $"{trip.Whence} - {trip.Where}\r\n" +
+                        $"Когда: {((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"Во сколько: {((DateTime)trip.DateTime).ToString("HH:mm")}\r\n" +
+                        $"Телефон: {trip.Phone}\r\n" +
+                        ((string.IsNullOrEmpty(trip.Comments)) ? null : $"Комментарии: {trip.Comments}");
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditPhoneButton)
+                {
+                    var trip = _tripRepository.GetTrip(userState.TripId);
+                    trip.Phone = buttonName;
+
+                    _tripRepository.Update(trip);
+
+                    userState.TypeButton = TypeButton.EditMenuButton;
+                    _userRepository.Update(userState);
+
+                    var button = new EditMenuButton();
+                    var result = button.GetResponse();
+                    result.Message =
+                        $"{trip.Whence} - {trip.Where}\r\n" +
+                        $"Когда: {((DateTime)trip.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                        $"Во сколько: {((DateTime)trip.DateTime).ToString("HH:mm")}\r\n" +
+                        $"Телефон: {trip.Phone}\r\n" +
+                        ((string.IsNullOrEmpty(trip.Comments)) ? null : $"Комментарии: {trip.Comments}");
+
+                    return result;
+                }
+
+                if (userState.TypeButton == TypeButton.EditDescriptionButton)
+                {
+                    var trip = _tripRepository.GetTrip(userState.TripId);
+                    trip.Comments = buttonName;
 
                     _tripRepository.Update(trip);
 
@@ -518,7 +608,7 @@ namespace TravelerBot.Api.Services.Logic
                     return result;
                 }
 
-                if (userState.TypeButton == TypeButton.EditPhoneButton)
+                if (userState.TypeButton == TypeButton.EditDescriptionButton)
                 {
                     var trip = _tripRepository.GetTripByUserStateId(userState.UserStateId);
                     trip.Comments = buttonName;
@@ -574,7 +664,14 @@ namespace TravelerBot.Api.Services.Logic
 
                     if (buttonName == "Искать")
                     {
-                        
+                        if (string.IsNullOrEmpty(userState.Filter))
+                        {
+                            return new ResponseModel
+                            {
+                                Message = "Необходимо указать хотя бы один пункт"
+                            };
+                        }
+
                         var tripOptionDess = JsonConvert.DeserializeObject<Trip>(userState.Filter);
 
                         var trips = _tripRepository.Get(tripOptionDess.Whence, tripOptionDess.Where, tripOptionDess.DateTime);
@@ -587,16 +684,19 @@ namespace TravelerBot.Api.Services.Logic
                             };
                         }
 
-                        var tripsAsString = trips.Select(t =>
-                        {
-                            return $"Водитель\r\n" +
-                            $"https://vk.com/id{t.UserState.AccountId}\r\n" +
-                            $"{t.Whence} - {t.Where}\r\n" +
-                            $"{((DateTime)t.DateTime).ToString("dd.MM.yyyy")}" +
-                            $"{((DateTime)t.DateTime).ToString("HH:mm")}";
-                        });
+                        var result = new List<string>();
 
-                        var message = string.Join("\r\n\r\n", tripsAsString);
+                        foreach (var entry in trips)
+                        {
+                            result.Add($"{entry.Whence} - {entry.Where}\r\n" +
+                                $"Когда: {((DateTime)entry.DateTime).ToString("dd.MM.yyyy")}\r\n" +
+                                $"Во сколько: {((DateTime)entry.DateTime).ToString("HH:mm")}\r\n" +
+                                $"Телефон: {entry.Phone}\r\n" +
+                                $"Страница: https://vk.com/id{entry.UserState.AccountId}\r\n" +
+                                ((string.IsNullOrEmpty(entry.Comments)) ? null : $"Комментарии {entry.Comments}"));
+                        }
+
+                        var message = string.Join("\r\n\r\n", result);
 
                         return new ResponseModel
                         {

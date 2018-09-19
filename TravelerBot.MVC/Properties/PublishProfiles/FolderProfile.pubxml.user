@@ -13,10 +13,10 @@
       <publishTime>09/10/2018 18:24:32</publishTime>
     </File>
     <File Include="App_Data/Trips.mdf">
-      <publishTime>09/14/2018 00:41:14</publishTime>
+      <publishTime>09/19/2018 10:28:31</publishTime>
     </File>
     <File Include="App_Data/Trips_log.ldf">
-      <publishTime>09/14/2018 00:41:14</publishTime>
+      <publishTime>09/19/2018 10:28:31</publishTime>
     </File>
     <File Include="Areas/HelpPage/HelpPage.css">
       <publishTime>09/10/2018 18:24:28</publishTime>
@@ -337,10 +337,10 @@
       <publishTime>02/01/2018 14:20:56</publishTime>
     </File>
     <File Include="bin/TravelerBot.MVC.dll">
-      <publishTime>09/14/2018 01:04:20</publishTime>
+      <publishTime>09/19/2018 10:28:31</publishTime>
     </File>
     <File Include="bin/TravelerBot.MVC.pdb">
-      <publishTime>09/14/2018 01:04:20</publishTime>
+      <publishTime>09/19/2018 10:28:31</publishTime>
     </File>
     <File Include="bin/WebGrease.dll">
       <publishTime>01/23/2014 16:57:34</publishTime>

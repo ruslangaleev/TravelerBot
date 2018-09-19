@@ -70,7 +70,7 @@ namespace TravelerBot.MVC.Data.Models
             var listButtons = new List<Button[]>();
             var tripsMessage = new List<string>();
 
-            int step = -1;
+            int step = 0;
 
             foreach (var entry in trips)
             {

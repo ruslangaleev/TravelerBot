@@ -66,7 +66,7 @@ namespace TravelerBot.MVC.Data.Models
                     {
                         new Button
                         {
-                            color = "default",
+                            color = "primary",
                             action = new Action
                             {
                                 label = "Искать",
@@ -105,7 +105,7 @@ namespace TravelerBot.MVC.Data.Models
 
             return new ResponseModel
             {
-                Message = "123",
+                Message = "Нажмите на кнопку для выбора фильтра, после на кнопку \"Искать\"",
                 Keyboard = keyboard
             };
         }
